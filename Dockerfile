@@ -13,11 +13,8 @@ COPY Gemfile Gemfile.lock ./
 RUN gem install bundler
 RUN bundle install --jobs 20 --retry 5
 
-COPY package.json yarn.lock ./
-RUN yarn --pure-lockfile --force
-
-COPY . .
-RUN yarn build
+COPY package.json ./
+RUN yarn install --check-files
 
 EXPOSE 3000
 CMD ["bash"]

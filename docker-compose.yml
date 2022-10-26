@@ -16,6 +16,7 @@ services:
     environment:
       RAILS_ENV: development
       RAILS_MAX_THREADS: 5
+    tty: true
 volumes:
   postgres:
 
