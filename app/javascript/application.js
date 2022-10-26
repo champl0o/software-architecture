@@ -1,8 +1,9 @@
-import React, { Component, PropTypes } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import ReactDOM from 'react-dom/client';
 
 import App from './components/app';
+import Test from './components/test';
 
 window.React = React
 
@@ -11,6 +12,7 @@ root.render(
   <BrowserRouter>
     <Routes>
       <Route path="/" element={<App />}/>
+      <Route path="/test" element={<Test />}/>
       <Route
         path="*"
         element={
