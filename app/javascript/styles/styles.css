@@ -280,3 +280,129 @@ option {
     color: var(--turbota-light-gray) !important;
     background-color: transparent !important;
 }
+
+.fc .fc-button-primary {
+    background-color: var(--fc-button-bg-color, transparent);
+    color: var(--fc-button-text-color, #2D3748);
+    border-color: var(--fc-button-border-color, #E2E8F0);
+}
+
+.fc .fc-button-primary:disabled {
+    background-color: var(--fc-button-bg-color, transparent);
+    color: var(--fc-button-text-color, #2D3748);
+    border-color: var(--fc-button-border-color, #E2E8F0);
+    opacity: 1.0 !important;
+}
+
+.fc .fc-toolbar-title {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 120%;
+    color: var(--fc-button-text-color, #2D3748);
+}
+
+.fc .fc-button-primary:not(:disabled):active, .fc .fc-button-primary:not(:disabled).fc-button-active {
+    background-color: var(--fc-button-active-bg-color, #DD6B20);
+    border-color: var(--fc-button-active-bg-color, #DD6B20);
+}
+
+.dayHeaderCustom {
+    margin: 10px;
+}
+
+.dayHeaderTitlePast {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+    /* identical to box height, or 24px */
+    
+    text-align: center;
+
+    /* gray/700 */
+
+    color: #718096;
+}
+
+.dayHeaderNumericPast {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 150%;
+    /* identical to box height, or 45px */
+
+    text-align: center;
+
+    /* gray/500 */
+
+    color: #718096;
+}
+
+.dayHeaderTitlePast {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+    /* identical to box height, or 24px */
+    
+    text-align: center;
+
+    /* gray/700 */
+
+    color: #2D3748;
+}
+
+.dayHeaderNumericFuture {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 150%;
+    /* identical to box height, or 45px */
+
+    text-align: center;
+
+    /* gray/700 */
+
+    color: #2D3748;
+}
+
+.dayHeaderTitleToday {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+    /* identical to box height, or 24px */
+    
+    text-align: center;
+
+    /* gray/700 */
+
+    color: #DD6B20;
+}
+
+.dayHeaderNumericToday {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 150%;
+    /* identical to box height, or 45px */
+
+    text-align: center;
+   
+    color: #FFFFFF;
+}
+
+.dayHeaderCircleToday {
+    background: #DD6B20 !important;
+}
+
+.fc-view-harness  {
+    border-radius: 50px;
+}

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 
-import { Flex, Spacer, Box, HStack, VStack, StackDivider, Text, Select, Button, Image, IconButton } from '@chakra-ui/react'
+import { Flex, Spacer, Box, HStack, VStack, StackDivider, Text, Select, Button, Image, IconButton, Circle  } from '@chakra-ui/react'
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 import { InputGroup, Input, InputLeftElement } from '@chakra-ui/react'
 import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
@@ -15,9 +15,15 @@ import {
     MenuOptionGroup,
     MenuDivider,
   } from '@chakra-ui/react'
+import FullCalendar from '@fullcalendar/react' 
+import dayGridPlugin from '@fullcalendar/daygrid' 
+import timeGridPlugin from '@fullcalendar/timegrid';
+
 import {getSlots} from  '../store/apiSlice'
 
 import { HamburgerIcon } from '@chakra-ui/icons'
+
+import 'bootstrap/dist/css/bootstrap.css';
 
 const AddWorkingHours = ({showAddHoursState}) => {
     const [showAddHours, setShowAddHours] = showAddHoursState;
@@ -133,14 +139,79 @@ const ConsultantSettings = () => {
 }
 const Calendar = () => {
 	const role = useSelector((state) => state.api.role);
+    const calendarHeaderConfig = {
+        isPast: {
+            title: 'dayHeaderTitlePast',
+            numeric: 'dayHeaderNumericPast',
+            circle: 'dayHeaderCircleTransparent'
+        },
+        isToday: {
+            title: 'dayHeaderTitleToday',
+            numeric: 'dayHeaderNumericToday',
+            circle: 'dayHeaderCircleToday'
+        },
+        isFuture: {
+            title: 'dayHeaderTitleFuture',
+            numeric: 'dayHeaderNumericFuture',
+            circle: 'dayHeaderCircleTransparent'
+        },
+    };
 
     return (
 		<Box className='page-body'>
             <VStack align='left' spacing={10}>
-				<Text className='heading-large'>Мій календар</Text>
-                {
-                    role === 'consultant' && <ConsultantSettings/>
-                }
+                <Text className='heading-large'>Мій календар</Text>
+			    <Box>
+                    <Flex align='top'>
+                        <Box>
+                        {
+                            role === 'consultant' && <ConsultantSettings/>
+                        }
+                        </Box>
+                        <Flex><Box w={10}></Box></Flex>
+                        <Flex grow='1' direction='column'>
+                            <FullCalendar 
+                                locale='uk'
+                                plugins={[ timeGridPlugin ]}
+                                timeZone= 'UTC'
+                                initialView= 'timeGridWeek'
+                                themeSystem= 'bootstrap5'
+                                allDaySlot={false}
+                                dayHeaderContent={(args) => {
+                                    const {date, isPast, isToday, isFuture, text} = args;
+                                    console.log("arg", args)
+                                    const tense = Object.keys(args).find(item => 
+                                        (item === 'isPast' || item === 'isToday' || item === 'isFuture') &&
+                                        args[item] === true);
+                                    const dayNames = text.split(' ');
+                                    const dayTitle = dayNames[0];
+                                    const dayNumeric = dayNames[1]?.split('.')[0];
+                                    return <Box className='dayHeaderCustom'><VStack spacing={3}>
+                                        <Text className={calendarHeaderConfig[tense].title}>{dayTitle}</Text>
+                                        {dayNumeric && <Circle w='44px' h='44px' className={calendarHeaderConfig[tense].circle}>
+                                        <Text className={calendarHeaderConfig[tense].numeric}>{dayNumeric}</Text>
+                                        </Circle >}
+                                    </VStack></Box>
+                                }}
+                                dayHeaderDidMount={() => {console.log('dayHeaderDidMount')}}
+                                headerToolbar= {{
+                                  left: 'prev,next today',
+                                  center: 'title',
+                                  right: 'timeGridWeek,timeGridDay'
+                                }}
+                                buttonText={{
+                                    today: 'Сьогодні',
+                                    week: 'Тиждень',
+                                    day: 'День',
+                                }}
+                                titleFormat={{
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric' 
+                                }}/>
+                        </Flex>
+                    </Flex>
+			    </Box>
             </VStack>
         </Box>
     )
