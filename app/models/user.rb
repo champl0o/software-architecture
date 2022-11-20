@@ -12,6 +12,8 @@ class User < ApplicationRecord
   validates :role, presence: true, inclusion: { in: roles.keys }
   validates :age, numericality: { greater_than_or_equal_to: 6, less_than_or_equal_to: 100 }
 
+  before_create :update_ratings
+
   class << self
     def search(query = nil, filter = nil, sort = nil)
       users = User.all
@@ -40,5 +42,10 @@ class User < ApplicationRecord
         users
       end
     end
+  end
+
+  def update_ratings
+    self.ratings = rand(1..5) + rand(1..9) / 10.0
+    self.ratings = 5 if self.ratings >= 5
   end
 end
