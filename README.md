@@ -13,3 +13,5 @@ To build a container, you should follow these steps:
 Go to the localhost to check is everything working: http://127.0.0.1:3000/
 
 Feel free to contact me with questions.
+### Run seeds
+To run rails seeds (the file seeds.rb in the db folder) you need to run this command 'docker-compose run web rails db:seed'

@@ -3,21 +3,31 @@ class Api::V1::ConsultationDefinitionsController < ApplicationController
 
   def index
     @consultation_definitions = ConsultationDefinition.all
+    json_string = ConsultationDefinitionSerializer.new(@consultation_definitions).serializable_hash.to_json
+    render json: json_string
   end
-  
-  def show; end
+
+  def show
+    json_string = ConsultationDefinitionSerializer.new(@consultation_definition).serializable_hash.to_json
+    render json: json_string
+  end
 
   def new
     @consultation_definition = ConsultationDefinition.new
+    json_string = ConsultationDefinitionSerializer.new(@consultation_definition).serializable_hash.to_json
+    render json: json_string
   end
 
-  def edit; end
+  def edit
+    json_string = ConsultationDefinitionSerializer.new(@consultation_definition).serializable_hash.to_json
+    render json: json_string
+  end
 
   def create
     @consultation_definition = ConsultationDefinition.new(consultation_definition_params)
 
     if @consultation_definition.save
-      render :show, status: :created, location: @consultation_definition
+      head :created
     else
       render json: @consultation_definition.errors, status: :unprocessable_entity
     end
@@ -25,14 +35,18 @@ class Api::V1::ConsultationDefinitionsController < ApplicationController
 
   def update
     if @consultation_definition.update(consultation_definition_params)
-      render :show, status: :ok, location: @consultation_definition
+      head :ok
     else
       render json: @consultation_definition.errors, status: :unprocessable_entity
     end
   end
 
   def destroy
-    @consultation_definition.destroy
+    if @consultation_definition.destroy
+      head :ok
+    else
+      render json: @consultation_definition.errors, status: :unprocessable_entity
+    end
   end
 
   private
@@ -42,6 +56,6 @@ class Api::V1::ConsultationDefinitionsController < ApplicationController
   end
 
   def consultation_definition_params
-    params.require(:consultation_definition).permit(:consultant_id, :day, :start_time, :end_time)
+    params.require(:consultation_definition).permit(:consultation_definition_id, :title, :duration)
   end
 end

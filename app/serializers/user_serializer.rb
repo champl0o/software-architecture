@@ -1,4 +1,12 @@
 class UserSerializer
   include JSONAPI::Serializer
-  attributes
+  include Rails.application.routes.url_helpers
+
+  has_many :consultations
+  has_many :schedules
+  attributes :id, :name, :surname, :username, :age, :city, :experience, :specialisation, :education, :ratings, :role
+
+  attributes :avatar_url do |object|
+    object.avatar.url
+  end
 end

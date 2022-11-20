@@ -3,19 +3,26 @@ class Api::V1::SchedulesController < ApplicationController
 
   def index
     @schedules = Schedule.all
+    json_string = ScheduleSerializer.new(@schedules).serializable_hash.to_json
+    render json: json_string
   end
 
   def new
     @schedule = Schedule.new
+    json_string = ScheduleSerializer.new(@schedule).serializable_hash.to_json
+    render json: json_string
   end
 
-  def edit; end
+  def edit
+    json_string = ScheduleSerializer.new(@schedule).serializable_hash.to_json
+    render json: json_string
+  end
 
   def create
     @schedule = Schedule.new(schedule_params)
 
     if @schedule.save
-      render :show, status: :created, location: @schedule
+      head :created
     else
       render json: @schedule.errors, status: :unprocessable_entity
     end
@@ -23,7 +30,7 @@ class Api::V1::SchedulesController < ApplicationController
 
   def update
     if @schedule.update(schedule_params)
-      render :show, status: :ok, location: @schedule
+      head :ok
     else
       render json: @schedule.errors, status: :unprocessable_entity
     end
@@ -31,6 +38,11 @@ class Api::V1::SchedulesController < ApplicationController
 
   def destroy
     @schedule.destroy
+    if @schedule.destroy
+      head :ok
+    else
+      render json: @schedule.errors, status: :unprocessable_entity
+    end
   end
 
   private
@@ -40,6 +52,6 @@ class Api::V1::SchedulesController < ApplicationController
   end
 
   def schedule_params
-    params.require(:schedule).permit(:consultant_id, :day, :start_time, :end_time)
+    params.require(:schedule).permit(:schedule_id, :day, :start_time, :end_time)
   end
 end

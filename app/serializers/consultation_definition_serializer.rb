@@ -1,4 +1,7 @@
 class ConsultationDefinitionSerializer
   include JSONAPI::Serializer
-  attributes 
+
+  belongs_to :consultant, record_type: :user, serializer: UserSerializer
+  has_many :consultations
+  attributes :id, :title, :duration, :description
 end
