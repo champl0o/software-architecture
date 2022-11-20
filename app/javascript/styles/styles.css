@@ -6,11 +6,13 @@
     --turbota-main: #2D3748;
     --turbota-focus: #DD6B20;
     --turbota-bg: #FFFFFF;
-  }
+    --turbota-tag: #FEEBCB;
+    --turbota-light-gray: #718096;
+}
 
 * {
     font-family: 'Inter' !important; 
-    color: var(--turbota-main) !important;
+    /* color: var(--turbota-main); */
 }
 
 .nav-link {
@@ -72,18 +74,6 @@
 }
 
 .join-button {
-    /* display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 10px 24px;
-    gap: 8px; */
-    
-    /* position: absolute;
-    width: 183px !important;
-    height: 48px;
-    left: 1217px;
-    top: 16px; */
     margin-left: var(--bs-navbar-brand-margin-end) !important;
     color: var(--turbota-bg) !important;
     background: var(--turbota-focus) !important;
@@ -91,9 +81,11 @@
 }
 
 .page-body {
+
     margin-top: 40px;
     margin-left: 40px;
     margin-right: 40px;
+    margin-bottom: 40px;
 }
 
 .heading-large {
@@ -124,16 +116,6 @@
     color: var(--turbota-main) !important;
 }
 
-.text-filtering-panel {
-    font-style: normal;
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 24px;
-
-    color: var(--turbota-main) !important;
-}
-
-
 .text-drop-filtering {
     font-style: normal;
     font-weight: 600;
@@ -145,4 +127,156 @@
 
 .filtering-panel {
     width: 305px;
+}
+
+.rating-tag {
+    background-color: var(--turbota-tag) !important;
+}
+
+.rating-icon {
+    margin-right: 5px;
+    color: var(--turbota-focus) !important;
+}
+
+.consultant-name {
+    /* position: absolute;
+    width: 133px;
+    height: 28px;
+    left: 192px;
+    top: 0px; */
+
+    /* text-xl/lineHeight-7/font-semibold */
+
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 28px;
+    /* identical to box height, or 140% */
+
+
+    /* gray/700 */
+
+    color: var(--turbota-main);
+}
+
+.consultant-name {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 28px;
+
+    color: var(--turbota-main);
+}
+
+.consultant-specialisation {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+
+    color: var(--turbota-light-gray);
+}
+
+.consultant-experience {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    
+    color: var(--turbota-main);
+}
+
+.consultant-page {
+    margin-left: 220px;
+    margin-right: 220px;
+}
+
+.slot-title {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 28px;
+
+    color: var(--turbota-main);
+}
+
+.slot-duration {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+
+    color: var(--turbota-light-gray);
+}
+
+.slot-description {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+
+    color: var(--turbota-main);
+}
+
+.consultant-tab {
+    color: #FFFFFF !important;
+    background-color: var(--turbota-focus) !important;
+}
+
+.from-to {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+
+    color: var(--turbota-light-gray);
+}
+
+.add-hours-heading {
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.select-item {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+
+    color: var(--turbota-main) !important;
+}
+
+option {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+
+    color: var(--turbota-main) !important;
+}
+
+.text-left {
+    text-align: left !important;
+}
+
+.tab-calendar {
+    padding: 0 !important;
+    padding-left: 0 !important;
+    padding-top: var(--chakra-space-4) !important;
+
+}
+
+.cancel-button {
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 20px;
+
+    color: var(--turbota-light-gray) !important;
+    background-color: transparent !important;
 }
