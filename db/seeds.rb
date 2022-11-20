@@ -8,9 +8,9 @@
 
 ActiveRecord::Base.transaction do
   pp 'users'
-  u1 = User.create!(name: 'Kenzo', surname: 'Tenma', specialisation: 'Terapist', education: 'University of Tokyo',
-                    experience: 10, age: 30, city: 'Lviv', role: 'consultant')
-  u2 = User.create!(name: 'Kazuma', surname: 'Kiryu', username: 'kazuma', role: 'user', city: 'Lviv', age: 30)
+  u1 = User.create!(name: 'Кензо', surname: 'Тенма', specialisation: 'Терапевт', education: 'УКУ',
+                    experience: 10, age: 30, city: 'Львів', role: 'consultant')
+  u2 = User.create!(name: 'Казума', surname: 'Кірю', username: 'kazuma', role: 'user', city: 'Львів', age: 30)
   u1.avatar.attach(io: URI.parse(Faker::Avatar.image).open, filename: 'kenzo.png')
   u2.avatar.attach(io: URI.parse(Faker::Avatar.image).open, filename: 'kazuma.png')
 
@@ -20,9 +20,9 @@ ActiveRecord::Base.transaction do
   sch3 = Schedule.create!(consultant: u1, day: 'wednesday', start_time: '10:00', end_time: '18:00')
 
   pp 'consultation_definitions'
-  cdef1 = ConsultationDefinition.create!(consultant: u1, title: 'Terapy', duration: 60, description: 'Terapy description')
-  cdef2 = ConsultationDefinition.create!(consultant: u1, title: 'Initial consultation', duration: 60,
-                          description: 'Initial consultation description')
+  cdef1 = ConsultationDefinition.create!(consultant: u1, title: 'Терапія', duration: 60, description: 'Опис терапії')
+  cdef2 = ConsultationDefinition.create!(consultant: u1, title: 'Стартова консультація', duration: 60,
+                          description: 'Опис стартової консультації')
 
   pp 'consultations'
   cons1 = Consultation.create!(consultation_definition: cdef1, user: u2, consultant: u1, appointment_time: '2021-11-21 10:00:00')
@@ -32,13 +32,13 @@ ActiveRecord::Base.transaction do
 
   pp 'users cycle'
   5.times do |i|
-    u = User.create!(name: Faker::Name.first_name, surname: Faker::Name.last_name, specialisation: 'Lawyer', education: 'University of Kyiv',
-      experience: 10, age: 30, city: 'Lviv', role: 'consultant')
+    u = User.create!(name: Faker::Name.first_name, surname: Faker::Name.last_name, specialisation: 'Юрист', education: 'КНУ',
+      experience: 10, age: 30, city: 'Львів', role: 'consultant')
     u.avatar.attach(io: URI.parse(Faker::Avatar.image).open, filename: "user#{i}.png")
   end
   5.times do |i|
-    u = User.create!(name: Faker::Name.first_name, surname: Faker::Name.last_name, specialisation: 'Nutritionist', education: 'University of Zhytomyr',
-      experience: 10, age: 30, city: 'Kyiv', role: 'consultant')
+    u = User.create!(name: Faker::Name.first_name, surname: Faker::Name.last_name, specialisation: 'Nutritionist', education: 'ЖНУ',
+      experience: 10, age: 30, city: 'Київ', role: 'consultant')
     u.avatar.attach(io: URI.parse(Faker::Avatar.image).open, filename: "user1#{i}.png")
   end
 end
