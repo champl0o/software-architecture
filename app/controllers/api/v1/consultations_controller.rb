@@ -3,21 +3,31 @@ class Api::V1::ConsultationsController < ApplicationController
 
   def index
     @consultations = Consultation.all
+    json_string = ConsultationSerializer.new(@consultations).serializable_hash.to_json
+    render json: json_string
   end
 
-  def show; end
-  
+  def show
+    json_string = ConsultationSerializer.new(@consultation).serializable_hash.to_json
+    render json: json_string
+  end
+
   def new
     @consultation = Consultation.new
+    json_string = ConsultationSerializer.new(@consultation).serializable_hash.to_json
+    render json: json_string
   end
 
-  def edit; end
+  def edit
+    json_string = ConsultationSerializer.new(@consultation).serializable_hash.to_json
+    render json: json_string
+  end
 
   def create
     @consultation = Consultation.new(consultation_params)
 
     if @consultation.save
-      render :show, status: :created, location: @consultation
+      head :created
     else
       render json: @consultation.errors, status: :unprocessable_entity
     end
@@ -25,7 +35,7 @@ class Api::V1::ConsultationsController < ApplicationController
 
   def update
     if @consultation.update(consultation_params)
-      render :show, status: :ok, location: @consultation
+      head :ok
     else
       render json: @consultation.errors, status: :unprocessable_entity
     end
@@ -42,6 +52,6 @@ class Api::V1::ConsultationsController < ApplicationController
   end
 
   def consultation_params
-    params.require(:consultation).permit(:user_id, :consultant_id, :rating_id, :date, :start_time, :end_time, :status)
+    params.require(:consultation).permit(:consultation_id, :rating_id, :date, :start_time, :end_time, :status)
   end
 end

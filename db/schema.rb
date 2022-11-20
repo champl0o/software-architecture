@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_11_13_112532) do
+ActiveRecord::Schema[7.0].define(version: 2022_11_20_114226) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -48,6 +48,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_13_112532) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "consultant_id", null: false
+    t.index ["consultant_id"], name: "index_consultation_definitions_on_consultant_id"
   end
 
   create_table "consultations", force: :cascade do |t|
@@ -60,14 +62,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_13_112532) do
     t.index ["consultant_id"], name: "index_consultations_on_consultant_id"
     t.index ["consultation_definition_id"], name: "index_consultations_on_consultation_definition_id"
     t.index ["user_id"], name: "index_consultations_on_user_id"
-  end
-
-  create_table "ratings", force: :cascade do |t|
-    t.integer "rating"
-    t.bigint "user_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_ratings_on_user_id"
   end
 
   create_table "schedules", force: :cascade do |t|
@@ -92,10 +86,12 @@ ActiveRecord::Schema[7.0].define(version: 2022_11_13_112532) do
     t.string "username"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.float "ratings"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "consultation_definitions", "users", column: "consultant_id"
   add_foreign_key "consultations", "consultation_definitions"
   add_foreign_key "consultations", "users"
   add_foreign_key "consultations", "users", column: "consultant_id"
