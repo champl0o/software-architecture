@@ -2,9 +2,13 @@ class Api::V1::SchedulesController < ApplicationController
   before_action :set_schedule, only: %i[show update destroy]
 
   def index
-    @schedules = Schedule.all
-    json_string = ScheduleSerializer.new(@schedules).serializable_hash.to_json
-    render json: json_string
+    if params[:consultant_id].present?
+      @schedules = Schedule.where(consultant_id: params[:consultant_id])
+      json_string = ScheduleSerializer.new(@schedules).serializable_hash.to_json
+      render json: json_string
+    else
+      render json: { error: 'No consultant id provided' }, status: :unprocessable_entity
+    end
   end
 
   def new
