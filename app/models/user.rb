@@ -18,7 +18,16 @@ class User < ApplicationRecord
     def search(query = nil, filter = nil, sort = nil)
       users = User.all
       users = users.where("name ILIKE :query OR surname ILIKE :query", query: "%#{query}%") if query.present?
-      users = users.where("ratings >= :filter", filter: filter) if filter.present?
+
+      if filter.present?
+        splitted_filter = filter.split
+        if splitted_filter.size == 3
+          filter = splitted_filter
+          users = users.where("ratings >= :first AND ratings <= :second", first: filter[0], second: filter[2])
+        else
+          users = users.where("city ILIKE :filter OR specialisation ILIKE :filter", filter: filter)
+        end
+      end
 
       # Не обовязково додавати всі поля, я просто так написав на всі випадки
       case sort
