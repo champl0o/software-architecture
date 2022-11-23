@@ -67,15 +67,51 @@ export const signIn = ({role}) => async (dispatch) => {
     // });
 }
 
+const parseConsultants = (consultants) => {
+    const consultantsList = consultants.filter(item => item.attributes.role === 'consultant').map(item => {
+        return {
+            ...item.attributes,
+        }
+    })
+    return consultantsList;
+}
+
 export const getConsultantsList = () => async (dispatch) => {
     const consultants = await API.getConsultants();
-    return consultants;
+    return parseConsultants(consultants);
 }
 
 export const getSlots = () => async (dispatch) => {
     const slots = await API.getSlots();
-    console.log("slots", slots)
     return slots;
+}
+
+export const getCities = () => async (dispatch) => {
+    const {cities} = await API.getCities();
+    return cities.data;
+}
+
+export const getSpecialisations = () => async (dispatch) => {
+    const {specialisations} = await API.getSpecialisations();
+    return specialisations.data;
+}
+
+export const searchConsultants = (sortBy) => async (dispatch) => {
+    const consultants = await API.searchUsers(sortBy);
+    console.log("searchConsultants", consultants)
+    return parseConsultants(consultants);
+}
+
+export const getConsultations = () => async (dispatch) => {
+    const consultations = await API.getConsultations();
+    console.log("consultations", consultations)
+    return consultations;
+}
+
+export const getSchedules = () => async (dispatch) => {
+    const schedules = await API.getSchedules();
+    console.log("schedules", schedules)
+    return schedules;
 }
 
 export default apiSlice.reducer;

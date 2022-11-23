@@ -20,7 +20,7 @@ import {
 	TagCloseButton,
 } from '@chakra-ui/react'
 import { Search2Icon, StarIcon, ArrowBackIcon } from '@chakra-ui/icons'
-import {getConsultantsList} from '../store/apiSlice'
+import {getConsultantsList, getCities, getSpecialisations, searchConsultants} from '../store/apiSlice'
 
 const CONSULTANT_SKELETON = 3;
 
@@ -38,17 +38,16 @@ const ConsultationSlot = ({title, duration, description }) => {
 
 }
 
-const ConsultantItem = ({name, surname, specialisation, experience, rating, slots, consultantToShowState}) => {
+const ConsultantItem = ({name, surname, specialisation, experience, rating, slots, avatar_url, consultantToShowState}) => {
 	const [consultantToShow, setConsultantToShow] = consultantToShowState;
 	return <HStack className='consultants-item' align='top' spacing={5}>
-		<Image boxSize='160px' borderRadius='8px' src='https://picsum.photos/160'/>
+		<Image boxSize='160px' borderRadius='8px' src={avatar_url}/>
 		<VStack align='left' spacing={5}>
 			<VStack align='left' >
 				<HStack justify='space-between'>
 					<Link className='consultant-name' onClick={(event) => {
 						if(!setConsultantToShow) return;
 						event.preventDefault();
-						console.log(slots)
 						setConsultantToShow({name, surname, specialisation, experience, rating, slots});
 					}}>{`${surname} ${name}`}</Link>
 					<HStack align='top' spacing={1}>
@@ -80,7 +79,6 @@ const ConsultantPage = ({consultantToShowState}) => {
 				<VStack align='left' spacing={3}>
 				{
 					consultantToShow.slots.map((slot, index) => {
-						console.log(slot)
 						return <Box><ConsultationSlot {...slot} /></Box>
 					})
 				}
@@ -90,19 +88,9 @@ const ConsultantPage = ({consultantToShowState}) => {
 	</VStack>
 }
 
-const ConsultantsList = ({consultantToShowState}) => {
-	const [consultants, setConsultants] = useState([]);
+const ConsultantsList = ({consultantToShowState, consultantsState}) => {
+	const [consultants, setConsultants] = consultantsState;
     const dispatch = useDispatch();
-
-	useEffect(() => {
-		const getConsultants = async () => {
-			const consultants = await dispatch(getConsultantsList());
-			console.log("consultants", consultants)
-			setConsultants([...consultants]);
-		}
-		getConsultants();
-	}, []);
-	
 
 	const getSkeleton = () => {
 		const skeleton = [];
@@ -125,7 +113,10 @@ const ConsultantsList = ({consultantToShowState}) => {
 	</VStack>
 }
 
-const SortingPanel = () => {
+const SortingPanel = ({sortOptionState}) => {
+	const [sortOption, setSortOption] = sortOptionState;
+
+	console.log("sortOption", sortOption)
 	return <Flex justify='space-between'>
 		<Box w='310px'>
 			<InputGroup>
@@ -133,15 +124,23 @@ const SortingPanel = () => {
 					pointerEvents='none'
 					children={<Search2Icon color='gray.300' />}
 				/>
-				<Input type='tel' placeholder='Шукати...' />
+				<Input type='tel' placeholder='Шукати...' onChange={(event) => {
+					const value = event.target.value;
+					if(value.length >= 3) {
+
+					}
+					console.log(event.target.value)
+				}}/>
 			</InputGroup>
 		</Box>
 		<Spacer />
 		<Box w='310px'>
-			<Select className='select-item' placeholder='Не обрано' >
+			<Select className='select-item' placeholder='Не обрано' value={sortOption} onChange={(event) => {
+				setSortOption(event.target.value);
+			}}>
 				<option value='rating'>За рейтингом</option>
-				<option value='city'>За містом проживання</option>
-				<option value='specialisation'>За спеціалізацією</option>
+				<option value='city'>За датою реєстрації</option>
+				<option value='specialisation'>За кількістю консультацій</option>
 			</Select>
 		</Box>
   </Flex>
@@ -149,6 +148,24 @@ const SortingPanel = () => {
 
 const FilteringPanel = ({ratingState}) => {
 	const [rating, setRating] = ratingState;
+	const [cities, setCities] = useState([]);
+	const [specialisations, setSpecialisations] = useState([]);
+
+    const dispatch = useDispatch();
+
+	const getSpecialisationList = async () => {
+		const specialisationsList = await dispatch(getSpecialisations());
+		setSpecialisations([...specialisationsList]);
+	}
+
+	useEffect(() => {
+		const getCitiesList = async () => {
+			const citiesList = await dispatch(getCities());
+			setCities([...citiesList]);
+		}
+		getCitiesList();
+		getSpecialisationList();
+	}, []);
 
 	const getRatingString = () => {
 		return rating.length === 0 ? ' ' : rating[1] === 5 ? `${rating[0]}+` : `${rating[0]} - ${rating[1]}`;
@@ -177,11 +194,23 @@ const FilteringPanel = ({ratingState}) => {
 		</Box>
 		<VStack className='filtering-panel' align='left'>
 			<Text className='text-filtering-panel'>Спеціалізація</Text>
-			<Select placeholder='Не обрана'/>
+			<Select placeholder='Не обрана'>
+			{
+				specialisations.map(item => {
+					return <option value={item.name}>{item.name}</option>
+				})
+			}
+			</Select>
 		</VStack>
 		<VStack className='filtering-panel' align='left'>
 			<Text className='text-filtering-panel'>Місто проживання</Text>
-			<Select placeholder='Не обрана'/>
+			<Select placeholder='Не обрана'>
+			{
+				cities.map(item => {
+					return <option value={item.name}>{item.name}</option>
+				})
+			}
+			</Select>
 		</VStack>
 		<VStack className='filtering-panel' align='left'>
 			<Text className='text-filtering-panel'>Рейтинг</Text>
@@ -220,8 +249,36 @@ const Consultants = () => {
 	const [rating, setRating] = useState([]);
 	const [profession, setProfession] = useState([]);
 	const [city, setCity] = useState([]);
-
+	const [searchByWord, setSearchByWord] = useState([]);
+	const [sortOption, setSortOption] = useState();
+	const [consultants, setConsultants] = useState([]);
 	const [consultantToShow, setConsultantToShow] = useState();
+
+    const dispatch = useDispatch();
+
+	const getConsultants = async () => {
+		const consultants = await dispatch(getConsultantsList());
+		console.log("consultants", consultants)
+		setConsultants([...consultants]);
+	}
+
+	const searchConsultantsList = async () => {
+		const consultants = await dispatch(searchConsultants(sortOption));
+		console.log("consultants", consultants)
+		setConsultants([...consultants]);
+	}
+
+
+	useEffect(() => {
+		getConsultants();
+	}, []);
+
+
+	useEffect(() => {
+		setConsultants([]);
+		searchConsultantsList();
+	}, [sortOption]);
+
 	return (
 		<Box className='page-body'>
 			{
@@ -238,9 +295,9 @@ const Consultants = () => {
 							<Flex grow='1' direction='column'>
 
 								{/* <VStack spacing={10} align='left'> */}
-									<SortingPanel/>
+									<SortingPanel sortOptionState={[sortOption, setSortOption]}/>
 									<Flex><Box h={10}></Box></Flex>
-									<ConsultantsList consultantToShowState={[consultantToShow, setConsultantToShow]}/>
+									<ConsultantsList consultantsState={[consultants, setConsultants]} consultantToShowState={[consultantToShow, setConsultantToShow]}/>
 								{/* </VStack> */}
 							</Flex>
 						</Flex>

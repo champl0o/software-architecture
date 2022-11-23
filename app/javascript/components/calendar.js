@@ -1,9 +1,12 @@
 import React, {useEffect, useState} from 'react';
+import ReactDOM from "react-dom";
 import { useSelector, useDispatch } from 'react-redux'
 
 import { Flex, Spacer, Box, HStack, VStack, StackDivider, Text, Select, Button, Image, IconButton, Circle  } from '@chakra-ui/react'
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 import { InputGroup, Input, InputLeftElement } from '@chakra-ui/react'
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Popover from 'react-bootstrap/Popover';
 import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
 import {
     Menu,
@@ -18,8 +21,9 @@ import {
 import FullCalendar from '@fullcalendar/react' 
 import dayGridPlugin from '@fullcalendar/daygrid' 
 import timeGridPlugin from '@fullcalendar/timegrid';
+import { UncontrolledPopover, PopoverBody } from "reactstrap";
 
-import {getSlots} from  '../store/apiSlice'
+import {getSlots, getConsultations, getSchedules} from  '../store/apiSlice'
 
 import { HamburgerIcon } from '@chakra-ui/icons'
 
@@ -104,7 +108,6 @@ const ConsultantSettings = () => {
     useEffect(() => {
         const getWorkingSlots = async () => {
 			const slots = await dispatch(getSlots());
-			console.log("workingHours", slots)
 			setWorkingHours([...slots]);
 		}
 		getWorkingSlots();
@@ -137,8 +140,13 @@ const ConsultantSettings = () => {
         </Tabs>
     </VStack>
 }
+
 const Calendar = () => {
 	const role = useSelector((state) => state.api.role);
+    const [consultations, setConsultations] = useState([]);
+    const [schedules, setSchedules] = useState([]);
+    const dispatch = useDispatch();
+
     const calendarHeaderConfig = {
         isPast: {
             title: 'dayHeaderTitlePast',
@@ -156,6 +164,19 @@ const Calendar = () => {
             circle: 'dayHeaderCircleTransparent'
         },
     };
+
+	useEffect(() => {
+		const getConsultationsList = async () => {
+			const consultationsList = await dispatch(getConsultations());
+			setConsultations([...consultationsList]);
+		}
+        const getSchedulesList = async () => {
+			const schedules = await dispatch(getSchedules());
+		}
+
+		getConsultationsList();
+        getSchedulesList();
+	}, []);
 
     return (
 		<Box className='page-body'>
@@ -179,7 +200,6 @@ const Calendar = () => {
                                 allDaySlot={false}
                                 dayHeaderContent={(args) => {
                                     const {date, isPast, isToday, isFuture, text} = args;
-                                    console.log("arg", args)
                                     const tense = Object.keys(args).find(item => 
                                         (item === 'isPast' || item === 'isToday' || item === 'isFuture') &&
                                         args[item] === true);
@@ -193,7 +213,7 @@ const Calendar = () => {
                                         </Circle >}
                                     </VStack></Box>
                                 }}
-                                dayHeaderDidMount={() => {console.log('dayHeaderDidMount')}}
+                                dayHeaderDidMount={() => {}}
                                 headerToolbar= {{
                                   left: 'prev,next today',
                                   center: 'title',
@@ -208,7 +228,37 @@ const Calendar = () => {
                                     year: 'numeric', 
                                     month: 'long', 
                                     day: 'numeric' 
-                                }}/>
+                                }}
+                                eventTextColor='#2D3748'
+                                eventBorderColor='#E2E8F0'
+                                eventBackgroundColor='#FFFFFF'
+                                eventMouseEnter={(info) => {
+                                    info.jsEvent.preventDefault();
+                                    info.el.style.borderColor = '#DD6B20';
+                                }}
+                                eventMouseLeave={(info) => {
+                                    info.jsEvent.preventDefault();
+                                    info.el.style.borderColor = '#E2E8F0';
+                                }}
+                                eventRender={(info) => {
+                                    $(info.el).popover({
+                                        title: title,
+                                        placement:'top',
+                                        trigger : 'hover',
+                                        content: startTime + " to " + endTime + " " + location,
+                                        container:'body'
+                                    }).popover('show');
+                                  }}
+                                events={[
+                                    { 
+                                        id: 0,
+                                        start: '2022-11-22T10:30:52.939Z',
+                                        end: '2022-11-22T12:30:52.939Z',
+                                        title: 'Парна консультація',
+
+                                    }, 
+                                ]}
+                                />
                         </Flex>
                     </Flex>
 			    </Box>
