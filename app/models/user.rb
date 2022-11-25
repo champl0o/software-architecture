@@ -46,7 +46,9 @@ class User < ApplicationRecord
       when 'education'
         users.order(:education)
       when 'ratings'
-        users.order(:ratings)
+        users.order(ratings: :desc)
+      when 'created_at'
+        users.order(:created_at)
       else
         users
       end

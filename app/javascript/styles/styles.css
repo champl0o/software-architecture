@@ -436,5 +436,229 @@ option {
     color: #2D3748;
 }
 
-.fc-event-selected, .fc-event:focus {
+.fc-event-header {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 120%;
+    
+    color: #2D3748;
+}
+
+.event-popover-header {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 120%;
+    
+    color: #2D3748;
+}
+
+.event.popover-time {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+
+    color: #2D3748;
+}
+
+.fc-timegrid-slot {
+    height: 60px !important;
+    border-bottom: 0 !important;
+}
+
+.fc-timegrid-slot-label-cushion {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+    
+    text-align: center;
+    
+    color: #718096;
+}
+
+.event-popover-title {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 120%;
+
+    color: #2D3748;
+}
+
+.event-popover-name {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 28px;
+    
+    color: #2D3748;
+}
+
+.event-popover-issue {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
+    
+    color: #2D3748;
+}
+
+.react-calendar__tile {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 28px;
+    
+    width: 40px;
+    height: 40px;
+    
+    color: #DD6B20;
+}
+
+.react-calendar__tile--active {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 28px;
+    
+    height: 40px;
+    width: 40px;
+    max-width: 40px;
+    border-radius: 40px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border: 1px solid #DD6B20;
+    background-color: #FEEBCB;
+    color: #DD6B20;
+}
+
+
+.react-calendar__tile:disabled {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 28px;
+
+    width: 40px;
+    height: 40px;
+
+    color: #718096;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 150%;
+
+    /* width: 40px;
+    height: 40px; */
+
+    text-align: center;
+
+    color: #718096;
+  }
+
+.react-calendar__navigation__label__labelText {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    
+    color: #2D3748;
+}
+
+.create-consultation-title {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 120%;
+
+    display: flex;
+    align-items: center;
+
+
+    color: #2D3748;
+}
+
+.create-consultation-duration {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    /* identical to box height, or 150% */
+
+
+    /* gray/500 */
+
+    color: #718096;
+
+}
+
+.create-consultation-name {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 28px;
+
+    color: #2D3748;
+}
+
+.create-consultation-button {
+    border: 1px solid #CBD5E0 !important;
+    color:  #2D3748 !important;
+}
+
+.create-consultation-button--active {
+    border: 1px solid #DD6B20 !important;
+    background-color: #FEEBCB !important;
+    color:  #DD6B20 !important;
+}
+
+.create-consultation-issue {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    
+    color: #2D3748;
+}
+
+.create-consultation-textarea-unnessesary {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    
+    color: #718096;
+}
+
+
+.confirm-button {
+    background-color: #DD6B20 !important;
+    color:  #FFFFFF !important;
+}
+
+.calendar-button {
+    color: #2D3748 !important;
 }
