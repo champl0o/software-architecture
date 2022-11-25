@@ -2,7 +2,7 @@ class Api::V1::ConsultationsController < ApplicationController
   skip_before_action :verify_authenticity_token
   before_action :set_consultation, only: %i[show update destroy]
   def index
-    @consultations = Consultation.all
+    @consultations = Consultation.all.includes(:consultant, :user, :consultation_definition)
     json_string = ConsultationSerializer.new(@consultations).serializable_hash.to_json
     render json: json_string
   end

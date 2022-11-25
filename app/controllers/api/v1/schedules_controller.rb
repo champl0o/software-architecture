@@ -3,7 +3,7 @@ class Api::V1::SchedulesController < ApplicationController
 
   def index
     if params[:consultant_id].present?
-      @schedules = Schedule.where(consultant_id: params[:consultant_id])
+      @schedules = Schedule.where(consultant_id: params[:consultant_id]).includes(:consultant)
       json_string = ScheduleSerializer.new(@schedules).serializable_hash.to_json
       render json: json_string
     else
