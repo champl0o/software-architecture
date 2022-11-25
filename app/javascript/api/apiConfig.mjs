@@ -9,6 +9,7 @@ export default () => {
             usersSearch: '/api/v1/users/search',
             consultationsList: '/api/v1/consultations',
             schedulesList: '/api/v1/schedules',
+            consultationDefinitions: '/api/v1/consultation_definitions',
         }
     }
 }

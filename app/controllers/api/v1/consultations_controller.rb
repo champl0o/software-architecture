@@ -1,6 +1,6 @@
 class Api::V1::ConsultationsController < ApplicationController
+  skip_before_action :verify_authenticity_token
   before_action :set_consultation, only: %i[show update destroy]
-
   def index
     @consultations = Consultation.all
     json_string = ConsultationSerializer.new(@consultations).serializable_hash.to_json
@@ -52,6 +52,6 @@ class Api::V1::ConsultationsController < ApplicationController
   end
 
   def consultation_params
-    params.require(:consultation).permit(:consultation_id, :rating_id, :date, :start_time, :end_time, :status)
+    params.require(:consultation).permit(:consultation_definition_id, :user_id, :consultant_id, :appointment_time)
   end
 end

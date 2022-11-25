@@ -4,17 +4,10 @@ import getAPIConfig from './apiConfig.mjs'
 const APIConfig = getAPIConfig();
 
 const fetchJSON = async (endpoint, options) => {
-    const urlencoded = new URLSearchParams();
-    if(options.body) {
-        Object.keys(options.body).forEach(key => {
-            urlencoded.append(key, options.body[key]);
-        });
-        options.body = urlencoded;
-    }
     options.credentials ='include';
 
     if(!options.headers) options.headers = {};
-    options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+    options.headers['Content-Type'] = 'application/json';
 
     try {
         const response = await fetch(endpoint, options);
@@ -88,26 +81,6 @@ const getConsultants = async () => {
     ]
 };
 
-const getSlots = async () => {
-    return [{
-        day: 'Понеділок',
-        time: [{
-            from: '11:00',
-            to: '12:00'
-        }, {
-            from: '14:00',
-            to: '18:00'
-        }]
-    }, {
-        day: 'Вівторок',
-        time: [{
-            from: '12:00',
-            to: '18:00'
-        }]
-    }]
-};
-
-
 const getCities = async () => {
     const responce =  await fetchJSON(`${APIConfig.url}${APIConfig.endpoints.citiesList}`, {
         method: 'GET'
@@ -122,11 +95,11 @@ const getSpecialisations = async () => {
     return responce;
 };
 
-const searchUsers = async (sortBy) => {
+const searchUsers = async (sort, filter, search) => {
     const responce =  await fetchJSON(
         `${APIConfig.url}${APIConfig.endpoints.usersSearch}?
         ${new URLSearchParams({
-            sort: "rating",
+            sort, filter, search
         })}`, {
         method: 'GET',
     });
@@ -140,14 +113,47 @@ const getConsultations = async () => {
     return responce;
 }
 
-const getSchedules = async () => {
-    const responce =  await fetchJSON(`${APIConfig.url}${APIConfig.endpoints.schedulesList}`, {
+const createConsultations = async ({appointment_time, issue, consultation_definition_id, user_id, consultant_id}) => {
+    const responce =  await fetchJSON(
+        `${APIConfig.url}${APIConfig.endpoints.consultationsList}`, {
+        method: 'POST',
+        body: JSON.stringify({
+            "consultation": {
+              "appointment_time": appointment_time,
+              "issue": issue,
+              "consultation_definition_id": consultation_definition_id,
+              "user_id": user_id,
+              "consultant_id": consultant_id
+            }
+        })
+    });
+    console.log("createConsultations", responce)
+    return responce;
+}
+
+const getSchedules = async (id) => {
+    console.log("getSchedules ID", id)
+    const responce =  await fetchJSON(
+        `${APIConfig.url}${APIConfig.endpoints.schedulesList}?consultant_id=${id}`, {
+        method: 'GET',
+    });
+    return responce;
+}
+
+const getConsultationTypes = async () => {
+    const responce =  await fetchJSON(`${APIConfig.url}${APIConfig.endpoints.consultationDefinitions}`, {
         method: 'GET'
     });
     return responce;
 }
 
-
 export default {
-    getConsultants, getSlots, getCities, getSpecialisations, searchUsers, getConsultations, getSchedules
+    getConsultants, 
+    getCities, 
+    getSpecialisations, 
+    searchUsers, 
+    getConsultations, 
+    getSchedules, 
+    getConsultationTypes,
+    createConsultations
 };

@@ -35,10 +35,6 @@ const AuthenticationModal = ({showModal}) => {
 	console.log("isLoggedIn", isLoggedIn)
 	const dispatch = useDispatch();
 	
-	// useEffect(() => {
-	// 	dispatch(checkAuthentication());
-	// }, []);
-	
 
 	const { isOpen, onOpen, onClose } = useDisclosure({isOpen: showAuthModal})
 
@@ -52,11 +48,11 @@ const AuthenticationModal = ({showModal}) => {
 			<ModalBody >
 				<VStack>
 					<Button className='modal-button' variant='outline' onClick={() => {
-						dispatch(signIn({role: 'user'}));
+						dispatch(signIn({role: 'user', userId: '2'}));
 						setShowAuthModal(false);
 					}}>Користувач</Button>
 					<Button className='modal-button' variant='outline' onClick={() => {
-						dispatch(signIn({role: 'consultant'}));
+						dispatch(signIn({role: 'consultant', userId: '1'}));
 						setShowAuthModal(false);
 					}}>Консультант</Button>
 				</VStack>
@@ -99,7 +95,7 @@ const Header = ({showModal}) => {
 						</LinkContainer>
 					</Nav>
 					{role ? 
-					<Button variant='outline' rightIcon={<CalendarIcon/>} onClick={(event) => {
+					<Button className='calendar-button' variant='outline' leftIcon={<CalendarIcon/>} onClick={(event) => {
 						navigate('/calendar');
 					}}>Мій календар</Button> : 
 					<Button className='join-button' rightIcon={<ArrowForwardIcon/>} onClick={(event) => {
@@ -115,9 +111,7 @@ const Header = ({showModal}) => {
 const App = () => {
 	const [showAuthModal, setShowAuthModal] = useState();
 	
-	
-
-  return (
+  	return (
     <ChakraProvider>
 		<BrowserRouter>
 			<Header showModal={[showAuthModal, setShowAuthModal]}/>

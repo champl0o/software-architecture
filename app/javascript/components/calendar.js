@@ -2,12 +2,12 @@ import React, {useEffect, useState} from 'react';
 import ReactDOM from "react-dom";
 import { useSelector, useDispatch } from 'react-redux'
 
-import { Flex, Spacer, Box, HStack, VStack, StackDivider, Text, Select, Button, Image, IconButton, Circle  } from '@chakra-ui/react'
+import { Flex, Spacer, Textarea, Box, HStack, VStack, StackDivider, Text, Select, Button, Image, IconButton, Circle  } from '@chakra-ui/react'
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 import { InputGroup, Input, InputLeftElement } from '@chakra-ui/react'
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
-import Popover from 'react-bootstrap/Popover';
 import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
+import { Skeleton, SkeletonCircle, SkeletonText } from '@chakra-ui/react'
+
 import {
     Menu,
     MenuButton,
@@ -18,16 +18,83 @@ import {
     MenuOptionGroup,
     MenuDivider,
   } from '@chakra-ui/react'
+  import {
+      Popover,
+      PopoverTrigger,
+      PopoverContent,
+      PopoverHeader,
+      PopoverBody,
+      PopoverFooter,
+      PopoverArrow,
+      PopoverCloseButton,
+      PopoverAnchor,
+    } from '@chakra-ui/react'
 import FullCalendar from '@fullcalendar/react' 
 import dayGridPlugin from '@fullcalendar/daygrid' 
 import timeGridPlugin from '@fullcalendar/timegrid';
-import { UncontrolledPopover, PopoverBody } from "reactstrap";
-
-import {getSlots, getConsultations, getSchedules} from  '../store/apiSlice'
+import {getSlots, getConsultations, getSchedules, getConsultationTypes} from  '../store/apiSlice'
 
 import { HamburgerIcon } from '@chakra-ui/icons'
 
 import 'bootstrap/dist/css/bootstrap.css';
+
+
+const AddConsultationType = ({showAddConsultationTypeState}) => {
+    const [showAddConsultationType, setShowAddConsultationType] = showAddConsultationTypeState;
+
+    return <VStack className='filtering-panel' spacing={7}>
+        <VStack>
+        <Text className='text-filtering-panel' w='310px'>Назва</Text>
+        <Box w='310px'>
+            <Input/>
+        </Box>
+        </VStack>
+        <VStack>
+        <Text className='text-filtering-panel' w='310px'>Тривалість (хв)</Text>
+        <Box w='310px'>
+            <Input/>
+        </Box>
+        </VStack>
+        <VStack>
+        <Text className='text-filtering-panel' w='310px'>Опис (необов'язково)</Text>
+        <Box w='310px'>
+            <Textarea/>
+        </Box>
+        </VStack>
+        <HStack>
+            <Button className='cancel-button' onClick={() => {
+                setShowAddHours();
+            }}>Скасувати</Button>
+            <Button className='text-drop-filtering consultant-tab' onClick={() => {
+                setShowAddHours();
+            }}>Зберегти</Button>
+        </HStack>
+    </VStack>
+}
+
+const TypesSlot = ({title, duration, description}) => {
+    return <Card  w='310px'>
+        <CardBody>
+        <HStack justify='space-between'>
+            <Text className='slot-title'>{title}</Text>
+            <Menu>
+                <MenuButton
+                    as={IconButton}
+                    icon={<HamburgerIcon />}
+                    variant='outline'
+                />
+                <MenuList>
+                    <MenuItem >
+                        Видалити 
+                    </MenuItem>
+                </MenuList>
+            </Menu>
+        </HStack>
+       <Text className='slot-duration'>{`${duration}`}</Text> 
+        <Text className='slot-description'>{description}</Text>
+        </CardBody>
+    </Card>
+}
 
 const AddWorkingHours = ({showAddHoursState}) => {
     const [showAddHours, setShowAddHours] = showAddHoursState;
@@ -71,7 +138,7 @@ const AddWorkingHours = ({showAddHoursState}) => {
     </VStack>
 }
 
-const WorkingHoursSlot = ({day, time}) => {
+const WorkingHoursSlot = ({day, start, end}) => {
     return <Card  w='310px'>
         <CardBody>
         <HStack justify='space-between'>
@@ -89,11 +156,9 @@ const WorkingHoursSlot = ({day, time}) => {
                 </MenuList>
             </Menu>
         </HStack>
-        {
-            time.map(item => {
-                return <Text className='slot-duration'>{`${item.from} - ${item.to}`}</Text> 
-            })
-        }
+      
+        <Text className='slot-duration'>{`${start} - ${end}`}</Text> 
+    
         {/* <Text className='slot-duration'>{time}</Text> */}
 
         </CardBody>
@@ -101,17 +166,28 @@ const WorkingHoursSlot = ({day, time}) => {
 }
 
 const ConsultantSettings = () => {
-    const [workingHours, setWorkingHours] = useState([]);
     const [showAddHours, setShowAddHours] = useState([]);
-    const dispatch = useDispatch();
+    const [showAddConsultationType, setShowAddConsultationType] = useState([]);
+    const [consultationTypes, setConsultationTypes] = useState([]);
+
+    const [schedules, setSchedules] = useState([]);
+
+	const dispatch = useDispatch();
+
+    const getSchedulesList = async () => {
+        const schedulesList = await dispatch(getSchedules(1));
+        setSchedules([...schedulesList])
+    }
+	const getConsultationTypesList = async () => {
+		const consultationTypesList = await dispatch(getConsultationTypes(`${1}`));
+		setConsultationTypes([...consultationTypesList]);
+	}
 
     useEffect(() => {
-        const getWorkingSlots = async () => {
-			const slots = await dispatch(getSlots());
-			setWorkingHours([...slots]);
-		}
-		getWorkingSlots();
+		getConsultationTypesList();
+        getSchedulesList();
     }, []);
+
     return <VStack className='filtering-panel' align='left' spacing={5}>
         <Tabs variant='soft-rounded'>
             <TabList justifyContent='space-between'>
@@ -122,19 +198,32 @@ const ConsultantSettings = () => {
                 <TabPanel className='tab-calendar'>
                 <VStack  align='left' spacing={3}>
                 {
-                    workingHours.map((item) => {
-                        return <WorkingHoursSlot day={item.day} time={item.time}/>
+                    schedules.map((item) => {
+                        return <WorkingHoursSlot day={item.day} start={item.start} end={item.end}/>
                     })
                 }
                 <Button colorScheme='transparent' className='text-drop-filtering text-left' w='310px' onClick={(event) => {
                     setShowAddHours(true);
-                }}>+ Додати робочі години</Button>
+                }}> + Додати робочі години</Button>
                 {
                     showAddHours && <AddWorkingHours showAddHoursState={[showAddHours, setShowAddHours]}/>
                 }
                 </VStack>
                 </TabPanel>
                 <TabPanel>
+                <VStack  align='left' spacing={3}>
+                {
+                    consultationTypes.map((item) => {
+                        return <TypesSlot {...item}/>
+                    })
+                }
+                <Button colorScheme='transparent' className='text-drop-filtering text-left' w='310px' onClick={(event) => {
+                    setShowAddConsultationType(true);
+                }}>+ Додати тип послуг</Button>
+                {
+                    showAddConsultationType && <AddConsultationType showAddConsultationTypeState={[showAddConsultationType, setShowAddConsultationType]}/> 
+                }
+                </VStack>
                 </TabPanel>
             </TabPanels>
         </Tabs>
@@ -143,8 +232,10 @@ const ConsultantSettings = () => {
 
 const Calendar = () => {
 	const role = useSelector((state) => state.api.role);
+	const userId = useSelector((state) => state.api.userId);
     const [consultations, setConsultations] = useState([]);
-    const [schedules, setSchedules] = useState([]);
+    const [isLoading, setIsLoading] = useState();
+
     const dispatch = useDispatch();
 
     const calendarHeaderConfig = {
@@ -165,19 +256,18 @@ const Calendar = () => {
         },
     };
 
+    const getConsultationsList = async () => {
+        setIsLoading(true);
+        const consultationsList = await dispatch(getConsultations(userId, role));
+        console.log("consultationsList", consultationsList)
+        setConsultations([...consultationsList]);
+        setIsLoading(false);
+    }
 	useEffect(() => {
-		const getConsultationsList = async () => {
-			const consultationsList = await dispatch(getConsultations());
-			setConsultations([...consultationsList]);
-		}
-        const getSchedulesList = async () => {
-			const schedules = await dispatch(getSchedules());
-		}
-
 		getConsultationsList();
-        getSchedulesList();
 	}, []);
 
+    console.log(userId)
     return (
 		<Box className='page-body'>
             <VStack align='left' spacing={10}>
@@ -191,6 +281,8 @@ const Calendar = () => {
                         </Box>
                         <Flex><Box w={10}></Box></Flex>
                         <Flex grow='1' direction='column'>
+                        {
+                            <Skeleton isLoaded ={!isLoading}>
                             <FullCalendar 
                                 locale='uk'
                                 plugins={[ timeGridPlugin ]}
@@ -198,6 +290,8 @@ const Calendar = () => {
                                 initialView= 'timeGridWeek'
                                 themeSystem= 'bootstrap5'
                                 allDaySlot={false}
+                                slotDuration={'00:60:00'}
+                                eventMinHeight={'60px'}
                                 dayHeaderContent={(args) => {
                                     const {date, isPast, isToday, isFuture, text} = args;
                                     const tense = Object.keys(args).find(item => 
@@ -240,25 +334,43 @@ const Calendar = () => {
                                     info.jsEvent.preventDefault();
                                     info.el.style.borderColor = '#E2E8F0';
                                 }}
-                                eventRender={(info) => {
-                                    $(info.el).popover({
-                                        title: title,
-                                        placement:'top',
-                                        trigger : 'hover',
-                                        content: startTime + " to " + endTime + " " + location,
-                                        container:'body'
-                                    }).popover('show');
+                                eventContent ={(info) => {
+                                    console.log(info)
+                                    return <Popover>
+                                    <PopoverTrigger>
+                                        {/* <Button colorScheme='transparent'> */}
+                                            <VStack w='100%' align='left'>
+                                                <Text className='fc-event-title'>{info.event._def.title}</Text>
+                                                <Text className='fc-event-time'>{info.timeText}</Text>
+                                            </VStack>
+                                        {/* </Button> */}
+                                    </PopoverTrigger>
+                                    <PopoverContent>
+                                      <PopoverArrow />
+                                      <PopoverCloseButton />
+                                      <PopoverBody>
+                                        <VStack w='100%' align='left' spacing={3}>
+                                            <VStack align='left'>
+                                                <Text className='event-popover-header'>{info.event._def.title}</Text>
+                                                <Text className='event-popover-time'>{(new Date(info.event._instance.range.start)).toLocaleDateString()}</Text>
+                                            </VStack>
+                                            <VStack align='left'>
+                                                <Text className='event-popover-title'>{role === 'user' ? 'Консультант' : 'Клієнт'}</Text>
+                                                <Text className='event-popover-name'>{`${info.event._def.extendedProps[role === 'user' ? 'consultant' : 'user'].surname} ${info.event._def.extendedProps[role === 'user' ? 'consultant' : 'user'].name}`}</Text>
+                                            </VStack>
+                                            <VStack align='left'>
+                                                <Text className='event-popover-title'>Проблема</Text>
+                                                <Text className='event-popover-issue'>{`${info.event._def.extendedProps.issue || 'Клієнт не залишив подробиць'}`}</Text>
+                                            </VStack>
+                                        </VStack>
+                                      </PopoverBody>
+                                    </PopoverContent>
+                                  </Popover>
                                   }}
-                                events={[
-                                    { 
-                                        id: 0,
-                                        start: '2022-11-22T10:30:52.939Z',
-                                        end: '2022-11-22T12:30:52.939Z',
-                                        title: 'Парна консультація',
-
-                                    }, 
-                                ]}
-                                />
+                                events={consultations}
+                                /> 
+                            </Skeleton>
+                        }
                         </Flex>
                     </Flex>
 			    </Box>
