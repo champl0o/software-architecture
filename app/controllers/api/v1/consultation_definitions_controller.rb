@@ -2,7 +2,7 @@ class Api::V1::ConsultationDefinitionsController < ApplicationController
   before_action :set_consultation_definition, only: %i[show update destroy]
 
   def index
-    @consultation_definitions = ConsultationDefinition.all
+    @consultation_definitions = ConsultationDefinition.all.includes(:consultations, :consultant)
     json_string = ConsultationDefinitionSerializer.new(@consultation_definitions).serializable_hash.to_json
     render json: json_string
   end
