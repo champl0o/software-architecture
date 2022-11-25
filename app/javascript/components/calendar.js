@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import ReactDOM from "react-dom";
 import { useSelector, useDispatch } from 'react-redux'
 
-import { Flex, Spacer, Textarea, Box, HStack, VStack, StackDivider, Text, Select, Button, Image, IconButton, Circle  } from '@chakra-ui/react'
+import { Flex, Spacer, Textarea, Box, HStack, Link, VStack, StackDivider, Text, Select, Button, Image, IconButton, Circle  } from '@chakra-ui/react'
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 import { InputGroup, Input, InputLeftElement } from '@chakra-ui/react'
 import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
@@ -239,7 +239,7 @@ const AddWorkingHours = ({showAddHoursState, addHoursState}) => {
 const WorkingHoursSlot = ({day, start, end, id, deleteHoursState}) => {
     const [deleteHours, setDeleteHours] = deleteHoursState;
     const toast = useToast();
-    
+
     return <Card  w='310px'>
         <CardBody>
         <HStack justify='space-between'>
@@ -538,7 +538,8 @@ const Calendar = () => {
                                       <PopoverArrow />
                                       <PopoverCloseButton />
                                       <PopoverBody>
-                                        <VStack w='100%' align='left' spacing={3}>
+                                        <VStack w='100%' align='left' spacing={5}>
+                                            <Box h='3px'></Box>
                                             <VStack align='left'>
                                                 <Text className='event-popover-header'>{info.event._def.title}</Text>
                                                 <Text className='event-popover-time'>{(new Date(info.event._instance.range.start)).toLocaleDateString()}</Text>
@@ -553,6 +554,10 @@ const Calendar = () => {
                                             <VStack align='left'>
                                                 <Text className='event-popover-title'>Проблема</Text>
                                                 <Text className='event-popover-issue'>{`${info.event._def.extendedProps.issue || 'Клієнт не залишив подробиць'}`}</Text>
+                                            </VStack>
+                                            <VStack align='left'>
+                                                <Text className='event-popover-title'>Посилання</Text>
+                                                <Link className='event-popover-link' href='https://google.com'>Посилання на сервіс відео-зв'язку</Link>
                                             </VStack>
                                             <VStack align='left'>
                                                 <Button variant='outline' onClick={() => {

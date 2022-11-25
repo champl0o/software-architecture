@@ -74,6 +74,7 @@
 }
 
 .join-button {
+    margin-top: 15px !important;
     margin-left: var(--bs-navbar-brand-margin-end) !important;
     color: var(--turbota-bg) !important;
     background: var(--turbota-focus) !important;
@@ -660,6 +661,7 @@ option {
 }
 
 .calendar-button {
+    margin-top: 15px !important;
     color: #2D3748 !important;
 }
 
@@ -669,4 +671,12 @@ option {
 
 .consultants-item {
     width: 100% !important;
+}
+
+.event-popover-link {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 150%;
 }
