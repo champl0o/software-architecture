@@ -1,8 +1,8 @@
 class User < ApplicationRecord
   has_one_attached :avatar
-  has_many :consultations
-  has_many :schedules, foreign_key: 'consultant_id', class_name: 'Schedule'
-  has_many :consultation_definitions, foreign_key: 'consultant_id', class_name: 'ConsultationDefinition'
+  has_many :consultations, dependent: :destroy
+  has_many :schedules, foreign_key: 'consultant_id', class_name: 'Schedule', dependent: :destroy
+  has_many :consultation_definitions, foreign_key: 'consultant_id', class_name: 'ConsultationDefinition', dependent: :destroy
 
   enum role: { user: 0, consultant: 1 }
 
