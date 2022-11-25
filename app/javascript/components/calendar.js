@@ -258,25 +258,26 @@ const ConsultantSettings = () => {
     const [deleteTypes, setDeleteTypes] = useState();
 
 	const dispatch = useDispatch();
+    const userId = useSelector((state) => state.api.userId);
 
     const getSchedulesList = async () => {
         setIsLoadingHours(true);
-        const schedulesList = await dispatch(getSchedules(1));
+        const schedulesList = await dispatch(getSchedules(userId));
         setSchedules([...schedulesList])
         setIsLoadingHours();
     }
 
     const addSchedule = async () => {
-        const schedulesList = await dispatch(createSchedule({consultant_id: 1, ...addHours}));
+        const schedulesList = await dispatch(createSchedule({consultant_id: userId, ...addHours}));
     }
 
     const addConsultationTypes = async () => {
-        const typesList = await dispatch(createConsultationType({consultant_id: 1, ...addTypes}));
+        const typesList = await dispatch(createConsultationType({consultant_id: userId, ...addTypes}));
     }
 
 	const getConsultationTypesList = async () => {
         setIsLoadingTypes(true);
-		const consultationTypesList = await dispatch(getConsultationTypes(`${1}`));
+		const consultationTypesList = await dispatch(getConsultationTypes(`${userId}`));
 		setConsultationTypes([...consultationTypesList]);
         setIsLoadingTypes();
 	}

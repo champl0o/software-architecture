@@ -61,15 +61,18 @@ const ConsultationModal = ({showModalState, title, duration, name, surname, avat
 
 	console.log("user_id", user_id)
     const getSlotsList = async () => {
-        const slotsList = await dispatch(getSlots(id));
+        const slotsList = await dispatch(getSlots(consultant_id));
         setSlots([...slotsList])
+
         console.log("slotsList", slotsList)
     }
 
 	const getFormattedDate = () => {
 		let date = new Date(currentData);
-		date.setHours(selectedSlot, 0, 0);   // Set hours, minutes and seconds
-		return date.toString();
+
+		date.setHours(selectedSlot + 2, 0, 0);   // Set hours, minutes and seconds
+		console.log("DATE", date.toUTCString())
+		return date.toUTCString();
 	 }
 
 	const addConsultation = async () => {
@@ -116,7 +119,7 @@ const ConsultationModal = ({showModalState, title, duration, name, surname, avat
 						}}/>
 					</Box>
 					<Box w='360px'>
-					<VStack align='top'>
+					<VStack align='top' spacing={3}>
 						<HStack>
 							<Text className='create-consultation-title'>{title}</Text>
 							<Text className='create-consultation-duration'>{`${duration} хв.`}</Text>
@@ -129,6 +132,7 @@ const ConsultationModal = ({showModalState, title, duration, name, surname, avat
 						{
 							currentDay ? slots.find(slot => slot.day === currentDay).slots.map(slot => {
 								return <Button className={selectedSlot === slot ? 'create-consultation-button--active' : 'create-consultation-button'} variant='outline' onClick={() => {
+									
 									setSelectedSlot(slot);
 								}}>{`${slot}:00`}</Button>
 							}) : 'Оберіть день'
@@ -195,9 +199,10 @@ const ConsultationSlot = ({id, title, duration, description, avatar_url, consult
 
 const ConsultantItem = ({id, name, surname, city, specialisation, experience, ratings, schedules, avatar_url, consultantToShowState}) => {
 	const [consultantToShow, setConsultantToShow] = consultantToShowState;
+	
 	return <HStack className='consultants-item' align='top' spacing={5}>
 		<Image boxSize='160px' borderRadius='8px' src={avatar_url}/>
-		<VStack align='left' spacing={5}>
+		<VStack align='left' spacing={5} className='consultants-info'>
 			<VStack align='left' >
 				<HStack justify='space-between'>
 					<Link className='consultant-name' onClick={(event) => {
@@ -222,12 +227,15 @@ const ConsultantItem = ({id, name, surname, city, specialisation, experience, ra
 const ConsultantPage = ({consultantToShowState}) => {
 	const [consultantToShow, setConsultantToShow] = consultantToShowState;
 	const [consultationTypes, setConsultationTypes] = useState([]);
+	const [isLoading, setIsLoading] = useState();
 
 	const dispatch = useDispatch();
 
 	const getConsultationTypesList = async () => {
+		setIsLoading(true);
 		const consultationTypesList = await dispatch(getConsultationTypes(`${consultantToShow.id}`));
 		setConsultationTypes([...consultationTypesList]);
+		setIsLoading();
 	}
 
 	useEffect(() => {
@@ -244,6 +252,7 @@ const ConsultantPage = ({consultantToShowState}) => {
 				<Text className='consultant-name'>
 					Послуги консультанта
 				</Text>
+				<Skeleton isLoaded={!isLoading}>
 				<VStack align='left' spacing={3}>
 				{
 					consultationTypes.map((slot, index) => {
@@ -252,6 +261,7 @@ const ConsultantPage = ({consultantToShowState}) => {
 					})
 				}
 				</VStack>
+				</Skeleton>
 			</VStack>
 		</VStack>
 	</VStack>

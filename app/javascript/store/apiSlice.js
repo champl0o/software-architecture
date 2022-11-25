@@ -119,13 +119,13 @@ export const getConsultations = (id, role) => async (dispatch) => {
     const consultations = await API.getConsultations();
 
     return consultations.filter((consultation)=> {
-        return consultation.attributes[role].id == id
+        return consultation.attributes[role].data.id == id
     }).map(consultation => {
         return {
             consultation_id: consultation.attributes.id,
             title: consultation.attributes.consultation_definition.title,
-            user: consultation.attributes.user,
-            consultant: consultation.attributes.consultant,
+            user: consultation.attributes.user.data.attributes,
+            consultant: consultation.attributes.consultant.data.attributes,
             issue: consultation.attributes.issue,
             start: consultation.attributes.appointment_time,
             end: addMinutes(new Date(consultation.attributes.appointment_time), consultation.attributes.consultation_definition.duration)

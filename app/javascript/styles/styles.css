@@ -662,3 +662,11 @@ option {
 .calendar-button {
     color: #2D3748 !important;
 }
+
+.consultants-info {
+    width: 100% !important;
+}
+
+.consultants-item {
+    width: 100% !important;
+}

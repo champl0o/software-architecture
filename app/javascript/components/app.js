@@ -48,11 +48,11 @@ const AuthenticationModal = ({showModal}) => {
 			<ModalBody >
 				<VStack>
 					<Button className='modal-button' variant='outline' onClick={() => {
-						dispatch(signIn({role: 'user', userId: '2'}));
+						dispatch(signIn({role: 'user', userId: '94'}));
 						setShowAuthModal(false);
 					}}>Користувач</Button>
 					<Button className='modal-button' variant='outline' onClick={() => {
-						dispatch(signIn({role: 'consultant', userId: '1'}));
+						dispatch(signIn({role: 'consultant', userId: '93'}));
 						setShowAuthModal(false);
 					}}>Консультант</Button>
 				</VStack>

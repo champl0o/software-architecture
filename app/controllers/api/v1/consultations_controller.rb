@@ -54,6 +54,6 @@ class Api::V1::ConsultationsController < ApplicationController
   end
 
   def consultation_params
-    params.require(:consultation).permit(:consultation_definition_id, :user_id, :consultant_id, :appointment_time)
+    params.require(:consultation).permit(:consultation_definition_id, :user_id, :consultant_id, :appointment_time, :issue)
   end
 end
