@@ -147,6 +147,57 @@ const getConsultationTypes = async () => {
     return responce;
 }
 
+const createSchedule = async ({consultant_id, day, start_time, end_time}) => {
+    const responce =  await fetchJSON(`${APIConfig.url}${APIConfig.endpoints.schedulesList}`, {
+        method: 'POST',
+        body: JSON.stringify({
+            "schedule": {
+                "consultant_id": consultant_id,
+                "day": day,
+                "start_time": start_time,
+                "end_time": end_time,
+            }
+        })
+    });
+    return responce;
+}
+
+const createConsultationType = async ({consultant_id, title, description, duration}) => {
+    const responce =  await fetchJSON(`${APIConfig.url}${APIConfig.endpoints.consultationDefinitions}`, {
+        method: 'POST',
+        body: JSON.stringify({
+            "consultation_definition": {
+                "consultant_id": consultant_id,
+                "title": title,
+                "description": description,
+                "duration": duration,
+            }
+        })
+    });
+    return responce;
+}
+
+const deleteConsultationType = async ({id}) => {
+    const responce =  await fetchJSON(`${APIConfig.url}${APIConfig.endpoints.consultationDefinitions}/${id}`, {
+        method: 'DELETE',
+    });
+    return responce;
+}
+
+const deleteSchedule = async ({id}) => {
+    const responce =  await fetchJSON(`${APIConfig.url}${APIConfig.endpoints.schedulesList}/${id}`, {
+        method: 'DELETE',
+    });
+    return responce;
+}
+
+const deleteConsultation = async ({id}) => {
+    const responce =  await fetchJSON(`${APIConfig.url}${APIConfig.endpoints.consultationsList}/${id}`, {
+        method: 'DELETE',
+    });
+    return responce;
+}
+
 export default {
     getConsultants, 
     getCities, 
@@ -155,5 +206,10 @@ export default {
     getConsultations, 
     getSchedules, 
     getConsultationTypes,
-    createConsultations
+    createConsultations,
+    createSchedule,
+    createConsultationType,
+    deleteConsultationType, 
+    deleteSchedule, 
+    deleteConsultation, 
 };

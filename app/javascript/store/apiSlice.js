@@ -180,4 +180,39 @@ export const createConsultation = async ({appointment_time, issue, consultation_
     return responce;
 }
 
+
+export const createSchedule = async ({consultant_id, day, start_time, end_time}) => {
+    console.log("createSchedule", {consultant_id, day, start_time, end_time})
+    const responce =  await API.createSchedule({
+        consultant_id, day, start_time, end_time
+    });
+    return responce;
+}
+
+export const createConsultationType = async ({consultant_id, title, description, duration}) => {
+    console.log("createConsultationType", {consultant_id, title, description, duration})
+    const responce =  await API.createConsultationType({
+        consultant_id, title, description, duration
+    });
+    return responce;
+}
+
+export const deleteConsultationType = async ({id}) => {
+    console.log("deleteConsultationType", {id})
+    const responce =  await API.deleteConsultationType({id});
+    return responce;
+}
+
+export const deleteConsultation = async ({id}) => {
+    console.log("deleteConsultationType", {id})
+    const responce =  await API.deleteConsultation({id});
+    return responce;
+}
+
+export const deleteWorkingHours = async ({id}) => {
+    console.log("deleteConsultationType", {id})
+    const responce =  await API.deleteSchedule({id});
+    return responce;
+}
+
 export default apiSlice.reducer;

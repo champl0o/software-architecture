@@ -1,4 +1,5 @@
 class Api::V1::SchedulesController < ApplicationController
+  skip_before_action :verify_authenticity_token
   before_action :set_schedule, only: %i[show update destroy]
 
   def index
@@ -56,6 +57,6 @@ class Api::V1::SchedulesController < ApplicationController
   end
 
   def schedule_params
-    params.require(:schedule).permit(:schedule_id, :day, :start_time, :end_time)
+    params.require(:schedule).permit(:consultant_id, :day, :start_time, :end_time)
   end
 end

@@ -32,47 +32,61 @@ import {
 import FullCalendar from '@fullcalendar/react' 
 import dayGridPlugin from '@fullcalendar/daygrid' 
 import timeGridPlugin from '@fullcalendar/timegrid';
-import {getSlots, getConsultations, getSchedules, getConsultationTypes} from  '../store/apiSlice'
+import {getSlots, getConsultations, getSchedules, getConsultationTypes, createSchedule, createConsultationType, deleteConsultation, deleteConsultationType, deleteWorkingHours} from  '../store/apiSlice'
 
 import { HamburgerIcon } from '@chakra-ui/icons'
 
 import 'bootstrap/dist/css/bootstrap.css';
+import { add } from '@hotwired/stimulus';
 
 
-const AddConsultationType = ({showAddConsultationTypeState}) => {
+const AddConsultationType = ({showAddConsultationTypeState, addTypesState}) => {
     const [showAddConsultationType, setShowAddConsultationType] = showAddConsultationTypeState;
+    const [addTypes, setAddTypes] = addTypesState;
+
+    const [title, setTitle] = useState();
+    const [description, setDescription] = useState();
+    const [duration, setDuration] = useState();
 
     return <VStack className='filtering-panel' spacing={7}>
         <VStack>
         <Text className='text-filtering-panel' w='310px'>Назва</Text>
         <Box w='310px'>
-            <Input/>
+            <Input onChange={(event) => {
+                setTitle(event.target.value);
+            }}/>
         </Box>
         </VStack>
         <VStack>
         <Text className='text-filtering-panel' w='310px'>Тривалість (хв)</Text>
         <Box w='310px'>
-            <Input/>
+            <Input onChange={(event) => {
+                setDuration(event.target.value);
+            }}/>
         </Box>
         </VStack>
         <VStack>
         <Text className='text-filtering-panel' w='310px'>Опис (необов'язково)</Text>
         <Box w='310px'>
-            <Textarea/>
+            <Textarea onChange={(event) => {
+                setDescription(event.target.value);
+            }}/>
         </Box>
         </VStack>
         <HStack>
             <Button className='cancel-button' onClick={() => {
-                setShowAddHours();
+                setShowAddConsultationType();
             }}>Скасувати</Button>
             <Button className='text-drop-filtering consultant-tab' onClick={() => {
-                setShowAddHours();
+                setShowAddConsultationType();
+                setAddTypes({title: title, description: description, duration: duration})
             }}>Зберегти</Button>
         </HStack>
     </VStack>
 }
 
-const TypesSlot = ({title, duration, description}) => {
+const TypesSlot = ({title, duration, description, id, deleteTypesState}) => {
+    const [deleteTypes, setDeleteTypes] = deleteTypesState;
     return <Card  w='310px'>
         <CardBody>
         <HStack justify='space-between'>
@@ -84,26 +98,35 @@ const TypesSlot = ({title, duration, description}) => {
                     variant='outline'
                 />
                 <MenuList>
-                    <MenuItem >
+                    <MenuItem onClick={() => 
+                        setDeleteTypes({id: id})
+                    }>
                         Видалити 
                     </MenuItem>
                 </MenuList>
             </Menu>
         </HStack>
-       <Text className='slot-duration'>{`${duration}`}</Text> 
+       <Text className='slot-duration'>{`${duration} хв.`}</Text> 
         <Text className='slot-description'>{description}</Text>
         </CardBody>
     </Card>
 }
 
-const AddWorkingHours = ({showAddHoursState}) => {
+const AddWorkingHours = ({showAddHoursState, addHoursState}) => {
     const [showAddHours, setShowAddHours] = showAddHoursState;
+    const [addHours, setAddHours] = addHoursState;
+    const [day, setDay] = useState();
+    const [startTime, setStartTime] = useState();
+    const [endTime, setEndTime] = useState();
+
 
     return <VStack className='filtering-panel' spacing={7}>
         <VStack>
         <Text className='text-filtering-panel' w='310px'>День</Text>
         <Box w='310px'>
-            <Select className='select-item' placeholder='Не обрано' >
+            <Select className='select-item' placeholder='Не обрано' onChange={(event) => {
+                setDay(event.target.value);
+            }} >
                 <option value='monday'>Понеділок</option>
                 <option value='tuesday'>Вівторок</option>
                 <option value='wednesday'>Середа</option>
@@ -119,26 +142,36 @@ const AddWorkingHours = ({showAddHoursState}) => {
         <HStack>
             <VStack>
                 <Text className='from-to' w='155px'>від</Text>
-                <Select  placeholder='Не обрано' />
+                <Input placeholder='Не обрано'  type="time" onChange={(event) => {
+                    console.log("start-time",event.target.value )
+                    setStartTime(event.target.value);
+                }} />
             </VStack>
             <VStack>
                 <Text className='from-to' w='155px'>до</Text>
-                <Select placeholder='Не обрано' />
+                <Input placeholder='Не обрано'  type="time" onChange={(event) => {
+                    console.log("end-time",event.target.value )
+                    setEndTime(event.target.value);
+                }}/>
             </VStack>
         </HStack>
         </VStack>
         <HStack>
             <Button className='cancel-button' onClick={() => {
                 setShowAddHours();
+
             }}>Скасувати</Button>
             <Button className='text-drop-filtering consultant-tab' onClick={() => {
                 setShowAddHours();
+                setAddHours({end_time: endTime, start_time: startTime, day: day});
             }}>Зберегти</Button>
         </HStack>
     </VStack>
 }
 
-const WorkingHoursSlot = ({day, start, end}) => {
+const WorkingHoursSlot = ({day, start, end, id, deleteHoursState}) => {
+    const [deleteHours, setDeleteHours] = deleteHoursState;
+
     return <Card  w='310px'>
         <CardBody>
         <HStack justify='space-between'>
@@ -150,7 +183,9 @@ const WorkingHoursSlot = ({day, start, end}) => {
                     variant='outline'
                 />
                 <MenuList>
-                    <MenuItem >
+                    <MenuItem onClick={() => {
+                        setDeleteHours({id: id});
+                    }}>
                         Видалити 
                     </MenuItem>
                 </MenuList>
@@ -169,24 +204,74 @@ const ConsultantSettings = () => {
     const [showAddHours, setShowAddHours] = useState([]);
     const [showAddConsultationType, setShowAddConsultationType] = useState([]);
     const [consultationTypes, setConsultationTypes] = useState([]);
-
+    const [isLoadingTypes, setIsLoadingTypes] = useState();
+    const [isLoadingHours, setIsLoadingHours] = useState();
     const [schedules, setSchedules] = useState([]);
+
+    const [addHours, setAddHours] = useState();
+    const [addTypes, setAddTypes] = useState();
+
+    const [deleteHours, setDeleteHours] = useState();
+    const [deleteTypes, setDeleteTypes] = useState();
 
 	const dispatch = useDispatch();
 
     const getSchedulesList = async () => {
+        setIsLoadingHours(true);
         const schedulesList = await dispatch(getSchedules(1));
         setSchedules([...schedulesList])
+        setIsLoadingHours();
     }
+
+    const addSchedule = async () => {
+        const schedulesList = await dispatch(createSchedule({consultant_id: 1, ...addHours}));
+    }
+
+    const addConsultationTypes = async () => {
+        const typesList = await dispatch(createConsultationType({consultant_id: 1, ...addTypes}));
+    }
+
 	const getConsultationTypesList = async () => {
+        setIsLoadingTypes(true);
 		const consultationTypesList = await dispatch(getConsultationTypes(`${1}`));
 		setConsultationTypes([...consultationTypesList]);
+        setIsLoadingTypes();
+	}
+
+    const deleteSchedules = async () => {
+		const consultationTypesList = await dispatch(deleteWorkingHours({id: deleteHours.id}));
+	}
+
+    const deleteConsultationTypes= async () => {
+		const consultationTypesList = await dispatch(deleteConsultationType({id: deleteTypes.id}));
 	}
 
     useEffect(() => {
 		getConsultationTypesList();
         getSchedulesList();
     }, []);
+
+    useEffect(() => {
+        addSchedule();
+		getSchedulesList();
+    }, [addHours])
+
+    
+    useEffect(() => {
+        addConsultationTypes();
+		getConsultationTypesList();
+    }, [addTypes])
+
+
+    useEffect(() => {
+        deleteSchedules();
+		getSchedulesList();
+    }, [deleteHours])
+
+    useEffect(() => {
+        deleteConsultationTypes();
+		getConsultationTypesList();
+    }, [deleteTypes])
 
     return <VStack className='filtering-panel' align='left' spacing={5}>
         <Tabs variant='soft-rounded'>
@@ -197,31 +282,35 @@ const ConsultantSettings = () => {
             <TabPanels>
                 <TabPanel className='tab-calendar'>
                 <VStack  align='left' spacing={3}>
+                <SkeletonText isLoaded={!isLoadingHours}>
                 {
                     schedules.map((item) => {
-                        return <WorkingHoursSlot day={item.day} start={item.start} end={item.end}/>
+                        return <WorkingHoursSlot {...item} deleteHoursState={[deleteHours, setDeleteHours]} />
                     })
                 }
+                 </SkeletonText >
                 <Button colorScheme='transparent' className='text-drop-filtering text-left' w='310px' onClick={(event) => {
                     setShowAddHours(true);
                 }}> + Додати робочі години</Button>
                 {
-                    showAddHours && <AddWorkingHours showAddHoursState={[showAddHours, setShowAddHours]}/>
+                    showAddHours && <AddWorkingHours showAddHoursState={[showAddHours, setShowAddHours]} addHoursState={[addHours, setAddHours]} />
                 }
                 </VStack>
                 </TabPanel>
                 <TabPanel>
                 <VStack  align='left' spacing={3}>
+                <SkeletonText isLoaded={!isLoadingTypes}>
                 {
                     consultationTypes.map((item) => {
-                        return <TypesSlot {...item}/>
+                        return <TypesSlot {...item} deleteTypesState={[deleteTypes, setDeleteTypes]} />
                     })
                 }
+                 </SkeletonText >
                 <Button colorScheme='transparent' className='text-drop-filtering text-left' w='310px' onClick={(event) => {
                     setShowAddConsultationType(true);
                 }}>+ Додати тип послуг</Button>
                 {
-                    showAddConsultationType && <AddConsultationType showAddConsultationTypeState={[showAddConsultationType, setShowAddConsultationType]}/> 
+                    showAddConsultationType && <AddConsultationType addTypesState={[addTypes, setAddTypes]} showAddConsultationTypeState={[showAddConsultationType, setShowAddConsultationType]}/> 
                 }
                 </VStack>
                 </TabPanel>
@@ -335,7 +424,6 @@ const Calendar = () => {
                                     info.el.style.borderColor = '#E2E8F0';
                                 }}
                                 eventContent ={(info) => {
-                                    console.log(info)
                                     return <Popover>
                                     <PopoverTrigger>
                                         {/* <Button colorScheme='transparent'> */}

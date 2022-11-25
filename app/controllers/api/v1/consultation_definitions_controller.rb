@@ -1,4 +1,5 @@
 class Api::V1::ConsultationDefinitionsController < ApplicationController
+  skip_before_action :verify_authenticity_token
   before_action :set_consultation_definition, only: %i[show update destroy]
 
   def index
@@ -56,6 +57,6 @@ class Api::V1::ConsultationDefinitionsController < ApplicationController
   end
 
   def consultation_definition_params
-    params.require(:consultation_definition).permit(:consultation_definition_id, :title, :duration)
+    params.require(:consultation_definition).permit(:consultant_id, :title, :duration, :description)
   end
 end
