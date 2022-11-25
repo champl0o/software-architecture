@@ -1,5 +1,6 @@
 class Api::V1::ConsultationsController < ApplicationController
   before_action :set_consultation, only: %i[show update destroy]
+  include ActiveStorage::SetCurrent
 
   def index
     @consultations = Consultation.all.includes(:consultant, :user, :consultation_definition)
