@@ -11,15 +11,16 @@ const fetchJSON = async (endpoint, options) => {
 
     try {
         const response = await fetch(endpoint, options);
-        const data = await response.json();
-        console.log(endpoint, options, data)
-
+        
         if (!response.ok) {
             throw {
                 message: data && data.message,
                 status: response.status
             }
         } else {
+            const data = await response.json();
+            console.log(endpoint, options, data)
+
             return data.data;
         }
     } catch(error)  {
@@ -96,10 +97,10 @@ const getSpecialisations = async () => {
 };
 
 const searchUsers = async (sort, filter, search) => {
+    console.log("searchUsers", sort, filter, search)
     const responce =  await fetchJSON(
-        `${APIConfig.url}${APIConfig.endpoints.usersSearch}?
-        ${new URLSearchParams({
-            sort, filter, search
+        `${APIConfig.url}${APIConfig.endpoints.usersSearch}?${new URLSearchParams({
+            sort: sort, filter: filter, search: search
         })}`, {
         method: 'GET',
     });

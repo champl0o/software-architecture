@@ -190,7 +190,7 @@ const ConsultationSlot = ({id, title, duration, description, avatar_url, consult
 					setShowModal(true);
 				})}>Записатися</Button>
 			</Flex>
-			<Text className='slot-duration'>{duration}</Text>
+			<Text className='slot-duration'>{`${duration} хв.`}</Text>
 			<Text className='slot-description'>{description}</Text>
 		</CardBody>
 	</Card>
@@ -454,17 +454,17 @@ const Consultants = () => {
 
 	const getConsultants = async () => {
 		setIsLoading(true);
-		const consultants = await dispatch(getConsultantsList());
-		console.log("consultants", consultants)
-		setConsultants([...consultants]);
+		const newConsultantsList = await dispatch(getConsultantsList());
+		console.log("consultants", newConsultantsList)
+		setConsultants([...newConsultantsList]);
 		setIsLoading();
 	}
 
 	const searchConsultantsList = async () => {
 		setIsLoading(true);
-		const consultants = await dispatch(searchConsultants(sortOption, filter, query));
-		console.log("consultants", consultants)
-		setConsultants([...consultants]);
+		const newConsultantsList = await dispatch(searchConsultants(sortOption, filter, query));
+		console.log("consultants", newConsultantsList)
+		setConsultants([...newConsultantsList]);
 		setIsLoading();
 
 	}

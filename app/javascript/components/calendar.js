@@ -29,11 +29,20 @@ import {
       PopoverCloseButton,
       PopoverAnchor,
     } from '@chakra-ui/react'
+import {
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogContent,
+    AlertDialogOverlay,
+    } from '@chakra-ui/react'
 import FullCalendar from '@fullcalendar/react' 
 import dayGridPlugin from '@fullcalendar/daygrid' 
 import timeGridPlugin from '@fullcalendar/timegrid';
 import {getSlots, getConsultations, getSchedules, getConsultationTypes, createSchedule, createConsultationType, deleteConsultation, deleteConsultationType, deleteWorkingHours} from  '../store/apiSlice'
 import { useDisclosure } from '@chakra-ui/react'
+import { useToast } from '@chakra-ui/react'
 
 import { HamburgerIcon } from '@chakra-ui/icons'
 
@@ -41,37 +50,42 @@ import 'bootstrap/dist/css/bootstrap.css';
 import { add } from '@hotwired/stimulus';
 
 
-const DeleteDialog = ({header, showModal}) => {
+const DeleteDialog = ({header, title, showModalState, onConfirm, onDecline}) => {
+    const [showModal, setShowModal] = showModalState;
     const { isOpen, onOpen, onClose } = useDisclosure({isOpen: showModal})
     const cancelRef = React.useRef()
   
     return (
       <>
-        <Button colorScheme='red' onClick={onOpen}>
-          Delete Customer
-        </Button>
-  
         <AlertDialog
           isOpen={isOpen}
           leastDestructiveRef={cancelRef}
-          onClose={onClose}
+          onClose={() => {
+            setShowModal();
+          }}
         >
           <AlertDialogOverlay>
             <AlertDialogContent>
               <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                    Видалити 
+                {header} 
               </AlertDialogHeader>
   
               <AlertDialogBody>
-                    Ви впевнені, що хочете видалити?
+                    {title}
               </AlertDialogBody>
   
               <AlertDialogFooter>
-                <Button ref={cancelRef} onClick={onClose}>
+                <Button ref={cancelRef} className='cancel-button' onClick={(event) => {
+                    onClose(event);
+                    setShowModal();
+                    onDecline && onDecline();
+                }}>
                     Скасувати
                 </Button>
-                <Button colorScheme='red' onClick={() => {
-                    
+                <Button colorScheme='red' onClick={(event) => {
+                    onClose(event);
+                    setShowModal();
+                    onConfirm && onConfirm();
                 }} ml={3}>
                     Видалити
                 </Button>
@@ -116,7 +130,8 @@ const AddConsultationType = ({showAddConsultationTypeState, addTypesState}) => {
             }}/>
         </Box>
         </VStack>
-        <HStack>
+        <Box w='310px'>
+        <HStack justify='flex-end'>
             <Button className='cancel-button' onClick={() => {
                 setShowAddConsultationType();
             }}>Скасувати</Button>
@@ -125,11 +140,13 @@ const AddConsultationType = ({showAddConsultationTypeState, addTypesState}) => {
                 setAddTypes({title: title, description: description, duration: duration})
             }}>Зберегти</Button>
         </HStack>
+        </Box>
     </VStack>
 }
 
 const TypesSlot = ({title, duration, description, id, deleteTypesState}) => {
     const [deleteTypes, setDeleteTypes] = deleteTypesState;
+    const toast = useToast();
     return <Card  w='310px'>
         <CardBody>
         <HStack justify='space-between'>
@@ -141,9 +158,14 @@ const TypesSlot = ({title, duration, description, id, deleteTypesState}) => {
                     variant='outline'
                 />
                 <MenuList>
-                    <MenuItem onClick={() => 
-                        setDeleteTypes({id: id})
-                    }>
+                    <MenuItem onClick={() => {
+                        setDeleteTypes({id: id});
+                        toast({
+                            title: `Тип послуг видалено`,
+                            status: 'info',
+                            isClosable: true,
+                        })
+                    }}>
                         Видалити 
                     </MenuItem>
                 </MenuList>
@@ -199,7 +221,8 @@ const AddWorkingHours = ({showAddHoursState, addHoursState}) => {
             </VStack>
         </HStack>
         </VStack>
-        <HStack>
+        <Box w='310px'>
+        <HStack justify='flex-end'>
             <Button className='cancel-button' onClick={() => {
                 setShowAddHours();
 
@@ -209,12 +232,14 @@ const AddWorkingHours = ({showAddHoursState, addHoursState}) => {
                 setAddHours({end_time: endTime, start_time: startTime, day: day});
             }}>Зберегти</Button>
         </HStack>
+        </Box>
     </VStack>
 }
 
 const WorkingHoursSlot = ({day, start, end, id, deleteHoursState}) => {
     const [deleteHours, setDeleteHours] = deleteHoursState;
-
+    const toast = useToast();
+    
     return <Card  w='310px'>
         <CardBody>
         <HStack justify='space-between'>
@@ -228,6 +253,11 @@ const WorkingHoursSlot = ({day, start, end, id, deleteHoursState}) => {
                 <MenuList>
                     <MenuItem onClick={() => {
                         setDeleteHours({id: id});
+                        toast({
+                            title: `Робочі години видалено`,
+                            status: 'info',
+                            isClosable: true,
+                        });
                     }}>
                         Видалити 
                     </MenuItem>
@@ -258,6 +288,8 @@ const ConsultantSettings = () => {
     const [deleteTypes, setDeleteTypes] = useState();
 
 	const dispatch = useDispatch();
+    const toast = useToast()
+
     const userId = useSelector((state) => state.api.userId);
 
     const getSchedulesList = async () => {
@@ -288,7 +320,7 @@ const ConsultantSettings = () => {
 
     const deleteConsultationTypes= async () => {
 		const consultationTypesList = await dispatch(deleteConsultationType({id: deleteTypes.id}));
-	}
+    }
 
     useEffect(() => {
 		getConsultationTypesList();
@@ -309,6 +341,7 @@ const ConsultantSettings = () => {
 
     useEffect(() => {
         deleteSchedules();
+      
 		getSchedulesList();
     }, [deleteHours])
 
@@ -327,13 +360,13 @@ const ConsultantSettings = () => {
                 <TabPanel className='tab-calendar'>
                 <VStack  align='left' spacing={3}>
                 <VStack>
-                    <SkeletonText isLoaded={!isLoadingHours}>
+                    <Skeleton isLoaded={!isLoadingHours}>
                     {
                         schedules.map((item) => {
                             return <WorkingHoursSlot {...item} deleteHoursState={[deleteHours, setDeleteHours]} />
                         })
                     }
-                    </SkeletonText >
+                    </Skeleton >
                  </VStack>
                 <Button colorScheme='transparent' className='text-drop-filtering text-left' w='310px' onClick={(event) => {
                     setShowAddHours(true);
@@ -343,15 +376,15 @@ const ConsultantSettings = () => {
                 }
                 </VStack>
                 </TabPanel>
-                <TabPanel>
+                <TabPanel className='tab-calendar'>
                 <VStack  align='left' spacing={3}>
-                <SkeletonText isLoaded={!isLoadingTypes}>
+                <Skeleton isLoaded={!isLoadingTypes}>
                 {
                     consultationTypes.map((item) => {
                         return <TypesSlot {...item} deleteTypesState={[deleteTypes, setDeleteTypes]} />
                     })
                 }
-                 </SkeletonText >
+                 </Skeleton >
                 <Button colorScheme='transparent' className='text-drop-filtering text-left' w='310px' onClick={(event) => {
                     setShowAddConsultationType(true);
                 }}>+ Додати тип послуг</Button>
@@ -370,7 +403,9 @@ const Calendar = () => {
 	const userId = useSelector((state) => state.api.userId);
     const [consultations, setConsultations] = useState([]);
     const [isLoading, setIsLoading] = useState();
+    const [showDeleteModal, setShowDeleteModal] = useState();
     const [deleteConsultationById, setDeleteConsultationById] = useState();
+    const toast = useToast()
 
     const dispatch = useDispatch();
 
@@ -408,14 +443,20 @@ const Calendar = () => {
 		getConsultationsList();
 	}, []);
 
-    useEffect(() => {
-        deleteConsultationFromCalendar();
-		getConsultationsList();
-	}, [deleteConsultationById]);
 
+    const onConfirmDelete = () => {
+        deleteConsultationFromCalendar();
+        toast({
+            title: `Консультацію видалено`,
+            status: 'info',
+            isClosable: true,
+        })
+		getConsultationsList();
+    }
     console.log(userId)
     return (
 		<Box className='page-body'>
+            <DeleteDialog header={'Видалити консультацію'} title={'Ви впевнені, що хочете видалити консультацію?'} showModalState={[showDeleteModal, setShowDeleteModal]} onConfirm={onConfirmDelete}/>
             <VStack align='left' spacing={10}>
                 <Text className='heading-large'>Мій календар</Text>
 			    <Box>
@@ -425,7 +466,9 @@ const Calendar = () => {
                             role === 'consultant' && <ConsultantSettings/>
                         }
                         </Box>
-                        <Flex><Box w={10}></Box></Flex>
+                        {
+                            role === 'consultant' && <Flex><Box w={10}></Box></Flex>
+                        }
                         <Flex grow='1' direction='column'>
                         {
                             <Skeleton isLoaded ={!isLoading}>
@@ -502,7 +545,10 @@ const Calendar = () => {
                                             </VStack>
                                             <VStack align='left'>
                                                 <Text className='event-popover-title'>{role === 'user' ? 'Консультант' : 'Клієнт'}</Text>
-                                                <Text className='event-popover-name'>{`${info.event._def.extendedProps[role === 'user' ? 'consultant' : 'user'].surname} ${info.event._def.extendedProps[role === 'user' ? 'consultant' : 'user'].name}`}</Text>
+                                                <HStack>
+                                                    <Image src={info.event._def.extendedProps[role === 'user' ? 'consultant' : 'user'].avatar_url} boxSize='40px' borderRadius='full'></Image>
+                                                    <Text className='event-popover-name'>{`${info.event._def.extendedProps[role === 'user' ? 'consultant' : 'user'].surname} ${info.event._def.extendedProps[role === 'user' ? 'consultant' : 'user'].name}`}</Text>
+                                                </HStack>
                                             </VStack>
                                             <VStack align='left'>
                                                 <Text className='event-popover-title'>Проблема</Text>
@@ -511,6 +557,7 @@ const Calendar = () => {
                                             <VStack align='left'>
                                                 <Button variant='outline' onClick={() => {
                                                     setDeleteConsultationById({id: info.event._def.extendedProps.consultation_id})
+                                                    setShowDeleteModal(true);
                                                 }}>Скасувати консультацію</Button>
                                             </VStack>
                                         </VStack>
