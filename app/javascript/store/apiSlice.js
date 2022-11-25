@@ -122,6 +122,7 @@ export const getConsultations = (id, role) => async (dispatch) => {
         return consultation.attributes[role].id == id
     }).map(consultation => {
         return {
+            consultation_id: consultation.attributes.id,
             title: consultation.attributes.consultation_definition.title,
             user: consultation.attributes.user,
             consultant: consultation.attributes.consultant,
@@ -168,7 +169,7 @@ export const getConsultationTypes = (id) => async (dispatch) => {
     });
 }
 
-export const createConsultation = async ({appointment_time, issue, consultation_definition_id, user_id, consultant_id}) => {
+export const createConsultation = ({appointment_time, issue, consultation_definition_id, user_id, consultant_id}) => async (dispatch) => {
     console.log("createConsultation", {appointment_time, issue, consultation_definition_id, user_id, consultant_id})
     const responce =  await API.createConsultations({
         appointment_time,
@@ -181,7 +182,7 @@ export const createConsultation = async ({appointment_time, issue, consultation_
 }
 
 
-export const createSchedule = async ({consultant_id, day, start_time, end_time}) => {
+export const createSchedule = ({consultant_id, day, start_time, end_time}) => async (dispatch) => {
     console.log("createSchedule", {consultant_id, day, start_time, end_time})
     const responce =  await API.createSchedule({
         consultant_id, day, start_time, end_time
@@ -189,7 +190,7 @@ export const createSchedule = async ({consultant_id, day, start_time, end_time})
     return responce;
 }
 
-export const createConsultationType = async ({consultant_id, title, description, duration}) => {
+export const createConsultationType = ({consultant_id, title, description, duration})  => async (dispatch) => {
     console.log("createConsultationType", {consultant_id, title, description, duration})
     const responce =  await API.createConsultationType({
         consultant_id, title, description, duration
@@ -197,19 +198,19 @@ export const createConsultationType = async ({consultant_id, title, description,
     return responce;
 }
 
-export const deleteConsultationType = async ({id}) => {
+export const deleteConsultationType = ({id}) => async (dispatch) => {
     console.log("deleteConsultationType", {id})
     const responce =  await API.deleteConsultationType({id});
     return responce;
 }
 
-export const deleteConsultation = async ({id}) => {
-    console.log("deleteConsultationType", {id})
+export const deleteConsultation =  ({id}) => async (dispatch) => {
+    console.log("deleteConsultation", {id})
     const responce =  await API.deleteConsultation({id});
     return responce;
 }
 
-export const deleteWorkingHours = async ({id}) => {
+export const deleteWorkingHours = ({id})=> async (dispatch) => {
     console.log("deleteConsultationType", {id})
     const responce =  await API.deleteSchedule({id});
     return responce;

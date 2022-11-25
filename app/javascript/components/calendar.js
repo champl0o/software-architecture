@@ -33,12 +33,55 @@ import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid' 
 import timeGridPlugin from '@fullcalendar/timegrid';
 import {getSlots, getConsultations, getSchedules, getConsultationTypes, createSchedule, createConsultationType, deleteConsultation, deleteConsultationType, deleteWorkingHours} from  '../store/apiSlice'
+import { useDisclosure } from '@chakra-ui/react'
 
 import { HamburgerIcon } from '@chakra-ui/icons'
 
 import 'bootstrap/dist/css/bootstrap.css';
 import { add } from '@hotwired/stimulus';
 
+
+const DeleteDialog = ({header, showModal}) => {
+    const { isOpen, onOpen, onClose } = useDisclosure({isOpen: showModal})
+    const cancelRef = React.useRef()
+  
+    return (
+      <>
+        <Button colorScheme='red' onClick={onOpen}>
+          Delete Customer
+        </Button>
+  
+        <AlertDialog
+          isOpen={isOpen}
+          leastDestructiveRef={cancelRef}
+          onClose={onClose}
+        >
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                    Видалити 
+              </AlertDialogHeader>
+  
+              <AlertDialogBody>
+                    Ви впевнені, що хочете видалити?
+              </AlertDialogBody>
+  
+              <AlertDialogFooter>
+                <Button ref={cancelRef} onClick={onClose}>
+                    Скасувати
+                </Button>
+                <Button colorScheme='red' onClick={() => {
+                    
+                }} ml={3}>
+                    Видалити
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
+      </>
+    )
+  }
 
 const AddConsultationType = ({showAddConsultationTypeState, addTypesState}) => {
     const [showAddConsultationType, setShowAddConsultationType] = showAddConsultationTypeState;
@@ -282,13 +325,15 @@ const ConsultantSettings = () => {
             <TabPanels>
                 <TabPanel className='tab-calendar'>
                 <VStack  align='left' spacing={3}>
-                <SkeletonText isLoaded={!isLoadingHours}>
-                {
-                    schedules.map((item) => {
-                        return <WorkingHoursSlot {...item} deleteHoursState={[deleteHours, setDeleteHours]} />
-                    })
-                }
-                 </SkeletonText >
+                <VStack>
+                    <SkeletonText isLoaded={!isLoadingHours}>
+                    {
+                        schedules.map((item) => {
+                            return <WorkingHoursSlot {...item} deleteHoursState={[deleteHours, setDeleteHours]} />
+                        })
+                    }
+                    </SkeletonText >
+                 </VStack>
                 <Button colorScheme='transparent' className='text-drop-filtering text-left' w='310px' onClick={(event) => {
                     setShowAddHours(true);
                 }}> + Додати робочі години</Button>
@@ -324,6 +369,7 @@ const Calendar = () => {
 	const userId = useSelector((state) => state.api.userId);
     const [consultations, setConsultations] = useState([]);
     const [isLoading, setIsLoading] = useState();
+    const [deleteConsultationById, setDeleteConsultationById] = useState();
 
     const dispatch = useDispatch();
 
@@ -352,9 +398,19 @@ const Calendar = () => {
         setConsultations([...consultationsList]);
         setIsLoading(false);
     }
+
+    const deleteConsultationFromCalendar = async () => {
+        const consultationsList = await dispatch(deleteConsultation({id: deleteConsultationById.id}));
+    }
+
 	useEffect(() => {
 		getConsultationsList();
 	}, []);
+
+    useEffect(() => {
+        deleteConsultationFromCalendar();
+		getConsultationsList();
+	}, [deleteConsultationById]);
 
     console.log(userId)
     return (
@@ -424,6 +480,7 @@ const Calendar = () => {
                                     info.el.style.borderColor = '#E2E8F0';
                                 }}
                                 eventContent ={(info) => {
+                                    console.log(info)
                                     return <Popover>
                                     <PopoverTrigger>
                                         {/* <Button colorScheme='transparent'> */}
@@ -449,6 +506,11 @@ const Calendar = () => {
                                             <VStack align='left'>
                                                 <Text className='event-popover-title'>Проблема</Text>
                                                 <Text className='event-popover-issue'>{`${info.event._def.extendedProps.issue || 'Клієнт не залишив подробиць'}`}</Text>
+                                            </VStack>
+                                            <VStack align='left'>
+                                                <Button variant='outline' onClick={() => {
+                                                    setDeleteConsultationById({id: info.event._def.extendedProps.consultation_id})
+                                                }}>Скасувати консультацію</Button>
                                             </VStack>
                                         </VStack>
                                       </PopoverBody>
